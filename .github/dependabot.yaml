@@ -1,0 +1,11 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 10
+    target-branch: development
+    assignees: [ dependabot ]
+    reviewers: [ BMSTU-ICS-CS-2019/sem6-asvt-i3000 ]
+    labels: [ automatic, dependencies ]
