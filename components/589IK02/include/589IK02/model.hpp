@@ -18,8 +18,8 @@
 
 class I3000_589IK02_Model : public IDSIMMODEL {
 private:
-    // INSTANCE
     IINSTANCE* _instance;
+    IDSIMCKT* _ckt;
 
     // INPUT PINS
     IDSIMPIN* _pin_CI;
@@ -29,6 +29,7 @@ private:
     IDSIMPIN* _pin_I0;
     IDSIMPIN* _pin_I1;
     IDSIMPIN* _pin_K0;
+    IDSIMPIN* _pin_K1;
     IDSIMPIN* _pin_F0;
     IDSIMPIN* _pin_F1;
     IDSIMPIN* _pin_F2;
@@ -52,6 +53,21 @@ private:
 
     IDSIMPIN* _pin_GND;
     IDSIMPIN* _pin_UCC;
+
+    // REGISTERS
+    UINT _rons[10]; // R0-R9
+    UINT _T = 0; // R10
+    UINT _PA = 0; // address register
+    UINT _AC = 0; // battery register
+
+    static UINT TO_UINT(IDSIMPIN* p8, IDSIMPIN* p4, IDSIMPIN* p2, IDSIMPIN* p1);
+
+    static UINT TO_UINT(IDSIMPIN* p4, IDSIMPIN* p2, IDSIMPIN* p1);
+
+    static UINT TO_UINT(IDSIMPIN* p2, IDSIMPIN* p1);
+
+    static UINT TO_UINT(IDSIMPIN* p);
+
 
 public:
     static constexpr DWORD MODEL_KEY = 0x00000002;

@@ -18,9 +18,10 @@ INT I3000_589IK02_Model::isdigital(CHAR* pinname) {
     return 1;
 }
 
-VOID I3000_589IK02_Model::setup(IINSTANCE* instance, IDSIMCKT* dsim) {
+VOID I3000_589IK02_Model::setup(IINSTANCE* instance, IDSIMCKT* dsimckt) {
     // INSTANCE
     _instance = instance;
+    _ckt = dsimckt;
 
     // INPUT PINS
     _pin_CI = instance->getdsimpin("CI", true);
@@ -30,6 +31,7 @@ VOID I3000_589IK02_Model::setup(IINSTANCE* instance, IDSIMCKT* dsim) {
     _pin_I0 = instance->getdsimpin("I0", true);
     _pin_I1 = instance->getdsimpin("I1", true);
     _pin_K0 = instance->getdsimpin("K0", true);
+    _pin_K1 = instance->getdsimpin("K1", true);
     _pin_F0 = instance->getdsimpin("F0", true);
     _pin_F1 = instance->getdsimpin("F1", true);
     _pin_F2 = instance->getdsimpin("F2", true);
@@ -53,6 +55,23 @@ VOID I3000_589IK02_Model::setup(IINSTANCE* instance, IDSIMCKT* dsim) {
 
     _pin_GND = instance->getdsimpin("GND", true);
     _pin_UCC = instance->getdsimpin("Ucc", true);
+
+    // SET 'SLO' STATE TO OUTPUT PINS
+    _pin_R0->setstate(SLO);
+    _pin_C0->setstate(SLO);
+    _pin_X->setstate(SLO);
+    _pin_Y->setstate(SLO);
+    _pin_A0->setstate(SLO);
+    _pin_A1->setstate(SLO);
+    _pin_D0->setstate(SLO);
+    _pin_D1->setstate(SLO);
+
+    for (UINT &_ron : _rons) {
+        _ron = 0;
+    }
+    _T = 0;
+    _PA = 0;
+    _AC = 0;
 }
 
 VOID I3000_589IK02_Model::runctrl(RUNMODES mode) {}
@@ -63,6 +82,158 @@ BOOL I3000_589IK02_Model::indicate(REALTIME time, ACTIVEDATA* newstate) {
     return FALSE;
 }
 
-VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {}
+VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
+    if (_pin_CLK->isposedge()) { // Ucc maybe?
+        // R-GROUP
+        UINT R_group = TO_UINT(_pin_F3, _pin_F2, _pin_F1, _pin_F0);
+        // F-GROUP
+        UINT F_group = TO_UINT(_pin_F6, _pin_F5, _pin_F4);
+
+        // Choosing Rn_AT or AT.
+        UINT* Rn_AT;
+        for (UINT & _ron : _rons) {
+            if (_ron == F_group) {
+                Rn_AT = &_ron;
+            }
+        }
+
+        if (R_group > 9) {
+            if ((R_group & 1) != 0) {
+                Rn_AT = &_AC;
+            } else {
+                Rn_AT = &_T;
+            }
+        }
+
+        UINT Rn_M_AT;
+
+        if (R_group == 10 || R_group == 11) {
+            Rn_M_AT = TO_UINT(_pin_M1, _pin_M0);
+        } else {
+            Rn_M_AT = *Rn_AT;
+        }
+
+        // Choosing B or AC.
+        UINT B_AC;
+        if (R_group < 14) {
+            B_AC = _AC;
+        } else {
+            B_AC = TO_UINT(_pin_I1, _pin_I0);
+        }
+
+        if (F_group > 1) {
+            B_AC = B_AC & TO_UINT(_pin_K1, _pin_K0);
+        }
+
+        UINT C1 = TO_UINT(_pin_CI);
+        UINT R1 = TO_UINT(_pin_RI);
+        UINT K = TO_UINT(_pin_K1, _pin_K0);
+
+        UINT C0 = 0U;
+        UINT R0 = 0U;
+
+
+        switch (F_group) {
+            case 0:
+                if (R_group < 14) {
+                    *Rn_AT = Rn_M_AT + B_AC + C1;
+                } else {
+                    R0 = 1 & Rn_M_AT & !B_AC;
+                    *Rn_AT = 2 & ((R1 << 1) | (B_AC & Rn_M_AT));
+                    *Rn_AT |= 1 & ((Rn_M_AT & B_AC) | ((Rn_M_AT & B_AC) >> 1));
+                }
+                break;
+            case 1:
+                if (R_group < 14) {
+                    _PA = K | Rn_M_AT;
+                    *Rn_AT = Rn_M_AT + K + C1;
+                } else {
+                    *Rn_AT = (!Rn_M_AT | K) + (Rn_M_AT & K) + C1;
+                }
+                break;
+            case 2:
+                *Rn_AT = B_AC - 1U + C1;
+                break;
+            case 3:
+                *Rn_AT = Rn_M_AT + B_AC + C1;
+                break;
+            case 4:
+                C0 = C1 | (Rn_M_AT & B_AC);
+                *Rn_AT = Rn_M_AT & B_AC;
+                break;
+            case 5:
+                C0 = C1 | (Rn_M_AT & K);
+                *Rn_AT = K & Rn_M_AT;
+                break;
+            case 6:
+                C0 = C1 | B_AC;
+                *Rn_AT = Rn_M_AT & B_AC;
+                break;
+            case 7:
+                C0 = C1 | (Rn_M_AT & B_AC);
+                *Rn_AT = !(Rn_M_AT ^ B_AC);
+                break;
+            default:
+                break;
+
+        }
+
+        // TODO: output logic
+    }
+
+    if (_pin_CLK->isnegedge()) {
+        // TODO: outputs A and D
+    }
+}
 
 VOID I3000_589IK02_Model::callback(ABSTIME time, EVENTID eventid) {}
+
+
+UINT I3000_589IK02_Model::TO_UINT(IDSIMPIN * p8, IDSIMPIN * p4, IDSIMPIN * p2, IDSIMPIN * p1)
+{
+    UINT res = 0U;
+    if (ishigh(p8->istate())) {
+        res += 8U;
+    }
+    if (ishigh(p4->istate())) {
+        res += 4U;
+    }
+    if (ishigh(p2->istate())) {
+        res += 2U;
+    }
+    if (ishigh(p1->istate())) {
+        res += 1U;
+    }
+    return res;
+}
+
+UINT I3000_589IK02_Model::TO_UINT(IDSIMPIN * p4, IDSIMPIN * p2, IDSIMPIN * p1)
+{
+    UINT res = 0U;
+    if (ishigh(p4->istate())) {
+        res += 4U;
+    }
+    if (ishigh(p2->istate())) {
+        res += 2U;
+    }
+    if (ishigh(p1->istate())) {
+        res += 1U;
+    }
+    return res;
+}
+
+UINT I3000_589IK02_Model::TO_UINT(IDSIMPIN *p2, IDSIMPIN *p1)
+{
+    UINT res = 0U;
+    if (ishigh(p2->istate())) {
+        res += 2U;
+    }
+    if (ishigh(p1->istate())) {
+        res += 1U;
+    }
+    return res;
+}
+
+UINT I3000_589IK02_Model::TO_UINT(IDSIMPIN2 *p) {
+    return ishigh(p->istate()) ? 1U : 0U;
+}
