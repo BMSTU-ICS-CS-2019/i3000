@@ -23,36 +23,36 @@ VOID I3000_589IK02_Model::setup(IINSTANCE* instance, IDSIMCKT* dsim) {
     _instance = instance;
 
     // INPUT PINS
-    _pin_CI = instance->getdsimpin("CI", false);
-    _pin_RI = instance->getdsimpin("RI", false);
-    _pin_M0 = instance->getdsimpin("M0", false);
-    _pin_M1 = instance->getdsimpin("M1", false);
-    _pin_I0 = instance->getdsimpin("I0", false);
-    _pin_I1 = instance->getdsimpin("I1", false);
-    _pin_K0 = instance->getdsimpin("K0", false);
-    _pin_F0 = instance->getdsimpin("F0", false);
-    _pin_F1 = instance->getdsimpin("F1", false);
-    _pin_F2 = instance->getdsimpin("F2", false);
-    _pin_F3 = instance->getdsimpin("F3", false);
-    _pin_F4 = instance->getdsimpin("F4", false);
-    _pin_F5 = instance->getdsimpin("F5", false);
-    _pin_F6 = instance->getdsimpin("F6", false);
-    _pin_CLK = instance->getdsimpin("CLK", false);
-    _pin_EA = instance->getdsimpin("EA", false);
-    _pin_ED = instance->getdsimpin("ED", false);
+    _pin_CI = instance->getdsimpin("CI", true);
+    _pin_RI = instance->getdsimpin("RI", true);
+    _pin_M0 = instance->getdsimpin("M0", true);
+    _pin_M1 = instance->getdsimpin("M1", true);
+    _pin_I0 = instance->getdsimpin("I0", true);
+    _pin_I1 = instance->getdsimpin("I1", true);
+    _pin_K0 = instance->getdsimpin("K0", true);
+    _pin_F0 = instance->getdsimpin("F0", true);
+    _pin_F1 = instance->getdsimpin("F1", true);
+    _pin_F2 = instance->getdsimpin("F2", true);
+    _pin_F3 = instance->getdsimpin("F3", true);
+    _pin_F4 = instance->getdsimpin("F4", true);
+    _pin_F5 = instance->getdsimpin("F5", true);
+    _pin_F6 = instance->getdsimpin("F6", true);
+    _pin_CLK = instance->getdsimpin("CLK", true);
+    _pin_EA = instance->getdsimpin("EA", true);
+    _pin_ED = instance->getdsimpin("ED", true);
 
     // OUTPUT PINS
-    _pin_R0 = instance->getdsimpin("R0", false);
-    _pin_C0 = instance->getdsimpin("C0", false);
-    _pin_X = instance->getdsimpin("X", false);
-    _pin_Y = instance->getdsimpin("Y", false);
-    _pin_A0 = instance->getdsimpin("A0", false);
-    _pin_A1 = instance->getdsimpin("A1", false);
-    _pin_D0 = instance->getdsimpin("D0", false);
-    _pin_D1 = instance->getdsimpin("D1", false);
+    _pin_R0 = instance->getdsimpin("R0", true);
+    _pin_C0 = instance->getdsimpin("C0", true);
+    _pin_X = instance->getdsimpin("X", true);
+    _pin_Y = instance->getdsimpin("Y", true);
+    _pin_A0 = instance->getdsimpin("A0", true);
+    _pin_A1 = instance->getdsimpin("A1", true);
+    _pin_D0 = instance->getdsimpin("D0", true);
+    _pin_D1 = instance->getdsimpin("D1", true);
 
-    _pin_GND = instance->getdsimpin("GND", false);
-    _pin_UCC = instance->getdsimpin("Ucc", false);
+    _pin_GND = instance->getdsimpin("GND", true);
+    _pin_UCC = instance->getdsimpin("Ucc", true);
 }
 
 VOID I3000_589IK02_Model::runctrl(RUNMODES mode) {}
