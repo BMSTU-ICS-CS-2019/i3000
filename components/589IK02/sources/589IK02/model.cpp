@@ -84,6 +84,8 @@ BOOL I3000_589IK02_Model::indicate(REALTIME time, ACTIVEDATA* newstate) {
 
 VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
     if (_pin_CLK->isposedge()) { // Ucc maybe?
+        INVERSE_INPUTS();
+
         // R-GROUP
         UINT R_group = TO_UINT(_pin_F3, _pin_F2, _pin_F1, _pin_F0);
         // F-GROUP
@@ -132,7 +134,6 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
         UINT C0 = 0U;
         UINT R0 = 0U;
 
-
         switch (F_group) {
             case 0:
                 if (R_group < 14) {
@@ -175,14 +176,38 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
                 break;
             default:
                 break;
+        }
+        _AC = *Rn_AT;
 
+        UINT a0 = TO_UINT(_pin_M0);
+        UINT a1 = TO_UINT(_pin_M1);
+        UINT b0 = TO_UINT(_pin_I0) & TO_UINT(_pin_K0);
+        UINT b1 = TO_UINT(_pin_I1) & TO_UINT(_pin_K1);
+
+        UINT X = a0 & b0 | a1 & b1;
+        UINT Y = a1 & b1 | a0 & b1 | b0 & b1 | a0 & a1;
+
+        /// Setting the states to outputs.
+        SET_STATE(C0 != 0U, _pin_C0, time);
+        SET_STATE(R0 != 0U, _pin_R0, time);
+        SET_STATE(X != 0U, _pin_X, time);
+        SET_STATE(Y != 0U, _pin_Y, time);
+
+        if (ishigh(_pin_EA->getstate())) {
+            SET_STATE(false, _pin_A0, time);
+            SET_STATE(false, _pin_A1, time);
+        } else {
+            SET_STATE((_PA & 1) != 0U, _pin_A0, time);
+            SET_STATE((_PA & 2) != 0U, _pin_A1, time);
         }
 
-        // TODO: output logic
-    }
-
-    if (_pin_CLK->isnegedge()) {
-        // TODO: outputs A and D
+        if (ishigh(_pin_ED->getstate())) {
+            SET_STATE(false, _pin_D0, time);
+            SET_STATE(false, _pin_D1, time);
+        } else {
+            SET_STATE((_AC & 1) != 0U, _pin_D0, time);
+            SET_STATE((_AC & 2) != 0U, _pin_D1, time);
+        }
     }
 }
 
@@ -236,4 +261,11 @@ UINT I3000_589IK02_Model::TO_UINT(IDSIMPIN *p2, IDSIMPIN *p1)
 
 UINT I3000_589IK02_Model::TO_UINT(IDSIMPIN2 *p) {
     return ishigh(p->istate()) ? 1U : 0U;
+}
+
+VOID I3000_589IK02_Model::SET_STATE(bool condition, IDSIMPIN2 *pin, ABSTIME time){
+    condition ? pin->setstate(time, details::DELAY, SHI) : pin->setstate(time, details::DELAY, SLO);
+}
+VOID I3000_589IK02_Model::INVERSE_INPUTS() {
+    // mb we need to inverse it?
 }

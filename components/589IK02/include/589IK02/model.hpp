@@ -16,6 +16,10 @@
 
 #include <i3000/prelude.hpp>
 
+namespace details{
+    const RELTIME DELAY = 50'000 ;
+}
+
 class I3000_589IK02_Model : public IDSIMMODEL {
 private:
     IINSTANCE* _instance;
@@ -67,6 +71,10 @@ private:
     static UINT TO_UINT(IDSIMPIN* p2, IDSIMPIN* p1);
 
     static UINT TO_UINT(IDSIMPIN* p);
+
+    VOID INVERSE_INPUTS();
+
+    static VOID SET_STATE(bool condition, IDSIMPIN2 *pin, ABSTIME time);
 
 
 public:
