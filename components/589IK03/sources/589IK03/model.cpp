@@ -14,12 +14,14 @@
 
 #include <589IK03/model.hpp>
 
+void SET_STATE(bool condition, IDSIMPIN2* pin, ABSTIME time);
 INT I3000_589IK03_Model::isdigital(CHAR* pinname) {
     return 1;
 }
 
-VOID I3000_589IK03_Model::setup(IINSTANCE* instance, IDSIMCKT* dsim) {
+VOID I3000_589IK03_Model::setup(IINSTANCE* instance, IDSIMCKT* dsimckt) {
     _instance = instance;
+    _ckt = dsimckt;
 
     _pin_EC8 = instance->getdsimpin("EC8", true);
     _pin_Y7 = instance->getdsimpin("Y7", true);
@@ -51,6 +53,16 @@ VOID I3000_589IK03_Model::setup(IINSTANCE* instance, IDSIMCKT* dsim) {
 
     _pin_UCC = instance->getdsimpin("Ucc", true);
     _pin_GND = instance->getdsimpin("GND", true);
+
+    // SET 'SLO' STATE TO OUTPUT PINS
+    _pin_CN8->setstate(SLO);
+    _pin_CN7->setstate(SLO);
+    _pin_CN6->setstate(SLO);
+    _pin_CN5->setstate(SLO);
+    _pin_CN4->setstate(SLO);
+    _pin_CN3->setstate(SLO);
+    _pin_CN2->setstate(SLO);
+    _pin_CN1->setstate(SLO);
 }
 
 
@@ -62,7 +74,52 @@ BOOL I3000_589IK03_Model::indicate(REALTIME time, ACTIVEDATA* newstate) {
     return FALSE;
 }
 
-VOID I3000_589IK03_Model::simulate(ABSTIME time, DSIMMODES mode) {}
+VOID I3000_589IK03_Model::simulate(ABSTIME time, DSIMMODES mode) {
+    if (_pin_EC8->isposedge()) { // Ucc maybe?
+        BOOL CN = !ishigh(_pin_CN->getstate());
+
+        BOOL Y7 = ishigh(_pin_Y7->getstate());
+        BOOL X7 = ishigh(_pin_X7->getstate());
+        BOOL Y6 = ishigh(_pin_Y6->getstate());
+        BOOL X6 = ishigh(_pin_X6->getstate());
+        BOOL Y5 = ishigh(_pin_Y5->getstate());
+        BOOL X5 = ishigh(_pin_X5->getstate());
+        BOOL Y4 = ishigh(_pin_Y4->getstate());
+        BOOL X4 = ishigh(_pin_X4->getstate());
+        BOOL Y3 = ishigh(_pin_Y3->getstate());
+        BOOL X3 = ishigh(_pin_X3->getstate());
+        BOOL Y2 = ishigh(_pin_Y2->getstate());
+        BOOL X2 = ishigh(_pin_X2->getstate());
+        BOOL Y1 = ishigh(_pin_Y1->getstate());
+        BOOL X1 = ishigh(_pin_X1->getstate());
+        BOOL Y0 = ishigh(_pin_Y0->getstate());
+        BOOL X0 = ishigh(_pin_X0->getstate());
+
+        BOOL CN1 = X0 & Y0 | Y0 & CN;
+        BOOL CN2 = X1 & Y1 | Y1 & CN1;
+        BOOL CN3 = X2 & Y2 | Y2 & CN2;
+        BOOL CN4 = X3 & Y3 | Y3 & CN3;
+        BOOL CN5 = X4 & Y4 | Y4 & CN4;
+        BOOL CN6 = X5 & Y5 | Y5 & CN5;
+        BOOL CN7 = X6 & Y6 | Y6 & CN6;
+        BOOL CN8 = X7 & Y7 | Y7 & CN7;
+
+        /// Setting the states to outputs.
+        SET_STATE(CN1, _pin_CN1, time);
+        SET_STATE(CN2, _pin_CN2, time);
+        SET_STATE(CN3, _pin_CN3, time);
+        SET_STATE(CN4, _pin_CN4, time);
+        SET_STATE(CN5, _pin_CN5, time);
+        SET_STATE(CN6, _pin_CN6, time);
+        SET_STATE(CN7, _pin_CN7, time);
+        SET_STATE(CN8, _pin_CN8, time);
+    }
+}
 
 VOID I3000_589IK03_Model::callback(ABSTIME time, EVENTID eventid) {}
+
+
+VOID I3000_589IK03_Model::SET_STATE(bool condition, IDSIMPIN2 *pin, ABSTIME time) {
+    condition ? pin->setstate(time, details::DELAY, SHI) : pin->setstate(time, details::DELAY, SLO);
+}
 

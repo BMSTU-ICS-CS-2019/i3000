@@ -16,10 +16,15 @@
 
 #include <i3000/prelude.hpp>
 
+namespace details{
+    const RELTIME DELAY = 50'000;
+}
+
 class I3000_589IK03_Model : public IDSIMMODEL {
 private:
     // INSTANCE
     IINSTANCE* _instance;
+    IDSIMCKT* _ckt;
 
     // INPUT PINS
     IDSIMPIN* _pin_EC8;
@@ -54,12 +59,14 @@ private:
     IDSIMPIN* _pin_UCC;
     IDSIMPIN* _pin_GND;
 
+    static VOID SET_STATE(bool condition, IDSIMPIN2 *pin, ABSTIME time);
+
 public:
     static constexpr DWORD MODEL_KEY = 0x00000003;
 
     INT isdigital(CHAR* pinname) override;
 
-    VOID setup(IINSTANCE* instance, IDSIMCKT* dsim) override;
+    VOID setup(IINSTANCE* instance, IDSIMCKT* dsimckt) override;
 
     VOID runctrl(RUNMODES mode) override;
 
