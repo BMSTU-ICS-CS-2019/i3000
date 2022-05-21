@@ -16,6 +16,10 @@
 
 #include <i3000/prelude.hpp>
 
+namespace details{
+    const RELTIME DELAY = 50'000;
+}
+
 class I3000_589IR12_Model : public IDSIMMODEL {
 private:
     // INSTANCE
@@ -34,7 +38,7 @@ private:
     IDSIMPIN* _pin_CS1;
     IDSIMPIN* _pin_CS2;
     IDSIMPIN* _pin_MD;
-    IDSIMPIN* _pin_EV;
+    IDSIMPIN* _pin_EW;
     IDSIMPIN* _pin_GND;
 
     // OUTPUT PINS
@@ -49,6 +53,7 @@ private:
     IDSIMPIN* _pin_Q8;
     IDSIMPIN* _pin_UCC;
 
+    static VOID SET_STATE(bool condition, IDSIMPIN2 *pin, ABSTIME time);
 public:
     static constexpr DWORD MODEL_KEY = 0x00000000;
 
