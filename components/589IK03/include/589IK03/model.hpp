@@ -56,9 +56,6 @@ private:
     IDSIMPIN* _pin_CN2;
     IDSIMPIN* _pin_CN1;
 
-    IDSIMPIN* _pin_UCC;
-    IDSIMPIN* _pin_GND;
-
     static VOID SET_STATE(bool condition, IDSIMPIN2 *pin, ABSTIME time);
 
 public:

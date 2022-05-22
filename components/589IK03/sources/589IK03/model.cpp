@@ -51,9 +51,6 @@ VOID I3000_589IK03_Model::setup(IINSTANCE* instance, IDSIMCKT* dsimckt) {
     _pin_CN2 = instance->getdsimpin("Cn+2", true);
     _pin_CN1 = instance->getdsimpin("Cn+1", true);
 
-    _pin_UCC = instance->getdsimpin("Ucc", true);
-    _pin_GND = instance->getdsimpin("GND", true);
-
     // SET 'SLO' STATE TO OUTPUT PINS
     _pin_CN8->setstate(SLO);
     _pin_CN7->setstate(SLO);
@@ -75,7 +72,7 @@ BOOL I3000_589IK03_Model::indicate(REALTIME time, ACTIVEDATA* newstate) {
 }
 
 VOID I3000_589IK03_Model::simulate(ABSTIME time, DSIMMODES mode) {
-    if (_pin_EC8->isposedge()) { // Ucc maybe?
+    if (_pin_EC8->isposedge()) {
         BOOL CN = !ishigh(_pin_CN->getstate());
 
         BOOL Y7 = ishigh(_pin_Y7->getstate());
