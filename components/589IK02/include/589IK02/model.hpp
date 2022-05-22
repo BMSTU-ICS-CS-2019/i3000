@@ -55,9 +55,6 @@ private:
     IDSIMPIN* _pin_D0;
     IDSIMPIN* _pin_D1;
 
-    IDSIMPIN* _pin_GND;
-    IDSIMPIN* _pin_UCC;
-
     // REGISTERS
     UINT _rons[10]; // R0-R9
     UINT _T = 0; // R10

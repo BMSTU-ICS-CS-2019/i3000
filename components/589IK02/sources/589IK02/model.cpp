@@ -53,9 +53,6 @@ VOID I3000_589IK02_Model::setup(IINSTANCE* instance, IDSIMCKT* dsimckt) {
     _pin_D0 = instance->getdsimpin("D0", true);
     _pin_D1 = instance->getdsimpin("D1", true);
 
-    _pin_GND = instance->getdsimpin("GND", true);
-    _pin_UCC = instance->getdsimpin("Ucc", true);
-
     // SET 'SLO' STATE TO OUTPUT PINS
     _pin_R0->setstate(SLO);
     _pin_C0->setstate(SLO);
@@ -67,7 +64,7 @@ VOID I3000_589IK02_Model::setup(IINSTANCE* instance, IDSIMCKT* dsimckt) {
     _pin_D1->setstate(SLO);
 
     for (UINT &_ron : _rons) {
-        _ron = 0;
+        _ron = 0U;
     }
     _T = 0;
     _PA = 0;
@@ -83,7 +80,7 @@ BOOL I3000_589IK02_Model::indicate(REALTIME time, ACTIVEDATA* newstate) {
 }
 
 VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
-    if (_pin_CLK->isposedge()) { // Ucc maybe?
+    if (_pin_CLK->isposedge()) {
         INVERSE_INPUTS();
 
         // R-GROUP
