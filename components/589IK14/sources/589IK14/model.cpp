@@ -43,8 +43,6 @@ VOID I3000_589IK14_Model::setup(IINSTANCE* instance, IDSIMCKT* dsim) {
     _pin_IC0 = instance->getdsimpin("IC0", true);
     _pin_GE = instance->getdsimpin("GE", true);
     _pin_IA = instance->getdsimpin("IA", true);
-    _pin_GND = instance->getdsimpin("GND", true);
-    _pin_UCC = instance->getdsimpin("UCC", true);
 }
 //External model DLL "i3000-components-589IK14.DLL" not found. GLE=0x000000C1.
 //                    i3000-components-589IK14.dll

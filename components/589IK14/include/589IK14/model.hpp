@@ -46,8 +46,6 @@ private:
     IDSIMPIN* _pin_IC0;
     IDSIMPIN* _pin_GE;
     IDSIMPIN* _pin_IA;
-    IDSIMPIN* _pin_GND;
-    IDSIMPIN* _pin_UCC;
 
 public:
     static constexpr DWORD MODEL_KEY = 0x00000000;
