@@ -73,7 +73,7 @@ BOOL I3000_589IK03_Model::indicate(REALTIME time, ACTIVEDATA* newstate) {
 
 VOID I3000_589IK03_Model::simulate(ABSTIME time, DSIMMODES mode) {
     if (_pin_EC8->isposedge()) {
-        BOOL CN = !ishigh(_pin_CN->getstate());
+        BOOL CN = islow(_pin_CN->getstate());
 
         BOOL Y7 = ishigh(_pin_Y7->getstate());
         BOOL X7 = ishigh(_pin_X7->getstate());
@@ -102,21 +102,21 @@ VOID I3000_589IK03_Model::simulate(ABSTIME time, DSIMMODES mode) {
         BOOL CN8 = X7 & Y7 | Y7 & CN7;
 
         /// Setting the states to outputs.
-        SET_STATE(CN1, _pin_CN1, time);
-        SET_STATE(CN2, _pin_CN2, time);
-        SET_STATE(CN3, _pin_CN3, time);
-        SET_STATE(CN4, _pin_CN4, time);
-        SET_STATE(CN5, _pin_CN5, time);
-        SET_STATE(CN6, _pin_CN6, time);
-        SET_STATE(CN7, _pin_CN7, time);
-        SET_STATE(CN8, _pin_CN8, time);
+        SET_INVERSE_STATE(CN1, _pin_CN1, time);
+        SET_INVERSE_STATE(CN2, _pin_CN2, time);
+        SET_INVERSE_STATE(CN3, _pin_CN3, time);
+        SET_INVERSE_STATE(CN4, _pin_CN4, time);
+        SET_INVERSE_STATE(CN5, _pin_CN5, time);
+        SET_INVERSE_STATE(CN6, _pin_CN6, time);
+        SET_INVERSE_STATE(CN7, _pin_CN7, time);
+        SET_INVERSE_STATE(CN8, _pin_CN8, time);
     }
 }
 
 VOID I3000_589IK03_Model::callback(ABSTIME time, EVENTID eventid) {}
 
 
-VOID I3000_589IK03_Model::SET_STATE(bool condition, IDSIMPIN2 *pin, ABSTIME time) {
-    condition ? pin->setstate(time, details::DELAY, SHI) : pin->setstate(time, details::DELAY, SLO);
+VOID I3000_589IK03_Model::SET_INVERSE_STATE(BOOL condition, IDSIMPIN2 *pin, ABSTIME time) {
+    condition != 0 ? pin->setstate(time, details::DELAY, SLO) : pin->setstate(time, details::DELAY, SHI);
 }
 

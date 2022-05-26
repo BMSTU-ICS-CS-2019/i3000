@@ -56,7 +56,7 @@ private:
     IDSIMPIN* _pin_CN2;
     IDSIMPIN* _pin_CN1;
 
-    static VOID SET_STATE(bool condition, IDSIMPIN2 *pin, ABSTIME time);
+    static VOID SET_INVERSE_STATE(BOOL condition, IDSIMPIN2 *pin, ABSTIME time);
 
 public:
     static constexpr DWORD MODEL_KEY = 0x00000003;
