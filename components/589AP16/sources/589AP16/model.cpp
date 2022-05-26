@@ -55,7 +55,31 @@ BOOL I3000_589AP16_Model::indicate(REALTIME time, ACTIVEDATA* newstate) {
 }
 
 VOID I3000_589AP16_Model::simulate(ABSTIME time, DSIMMODES mode) {
-
+    /// При наличии лог. 1 на входе CS формирователи находятся в выключенном состоянии и выходы имеют высокое сопротивление
+    if (ishigh(_pin_CS->getstate())) {
+        _pin_DB0->setstate(SLO);
+        _pin_DB1->setstate(SLO);
+        _pin_DB2->setstate(SLO);
+        _pin_DB3->setstate(SLO);
+        _pin_DO0->setstate(SLO);
+        _pin_DO1->setstate(SLO);
+        _pin_DO2->setstate(SLO);
+        _pin_DO3->setstate(SLO);
+    } else {
+        /// При наличии на входе DCE лог. 1 происходит передача информации с входов DB на выходы DO
+        if (ishigh(_pin_DCE->getstate())) {
+            _pin_DO0->setstate(_pin_DB0->getstate());
+            _pin_DO1->setstate(_pin_DB1->getstate());
+            _pin_DO2->setstate(_pin_DB2->getstate());
+            _pin_DO3->setstate(_pin_DB3->getstate());
+        } else {
+            /// Если на входе DCE присутствует напряжение лог. 0, то открыта передача информации с входов DI на выходы DB
+            _pin_DB0->setstate(_pin_DI0->getstate());
+            _pin_DB1->setstate(_pin_DI1->getstate());
+            _pin_DB2->setstate(_pin_DI2->getstate());
+            _pin_DB3->setstate(_pin_DI3->getstate());
+        }
+    }
 }
 
 VOID I3000_589AP16_Model::callback(ABSTIME time, EVENTID eventid) {}
