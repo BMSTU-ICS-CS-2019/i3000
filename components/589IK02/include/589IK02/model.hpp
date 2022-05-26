@@ -65,11 +65,9 @@ private:
 
     static UINT TO_UINT(IDSIMPIN* p4, IDSIMPIN* p2, IDSIMPIN* p1);
 
-    static UINT TO_UINT(IDSIMPIN* p2, IDSIMPIN* p1);
+    static UINT TO_INVERSE_UINT(IDSIMPIN *p2, IDSIMPIN *p1);
 
-    static UINT TO_UINT(IDSIMPIN* p);
-
-    VOID INVERSE_INPUTS();
+    static UINT TO_INVERSE_UINT(IDSIMPIN2 *p);
 
     static VOID SET_STATE(bool condition, IDSIMPIN2 *pin, ABSTIME time);
 

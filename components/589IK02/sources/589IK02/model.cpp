@@ -81,7 +81,6 @@ BOOL I3000_589IK02_Model::indicate(REALTIME time, ACTIVEDATA* newstate) {
 
 VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
     if (_pin_CLK->isposedge()) {
-        INVERSE_INPUTS();
 
         // R-GROUP
         UINT R_group = TO_UINT(_pin_F3, _pin_F2, _pin_F1, _pin_F0);
@@ -107,7 +106,7 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
         UINT Rn_M_AT;
 
         if (R_group == 10 || R_group == 11) {
-            Rn_M_AT = TO_UINT(_pin_M1, _pin_M0);
+            Rn_M_AT = TO_INVERSE_UINT(_pin_M1, _pin_M0);
         } else {
             Rn_M_AT = *Rn_AT;
         }
@@ -117,16 +116,16 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
         if (R_group < 14) {
             B_AC = _AC;
         } else {
-            B_AC = TO_UINT(_pin_I1, _pin_I0);
+            B_AC = TO_INVERSE_UINT(_pin_I1, _pin_I0);
         }
 
         if (F_group > 1) {
-            B_AC = B_AC & TO_UINT(_pin_K1, _pin_K0);
+            B_AC = B_AC & TO_INVERSE_UINT(_pin_K1, _pin_K0);
         }
 
-        UINT C1 = TO_UINT(_pin_CI);
-        UINT R1 = TO_UINT(_pin_RI);
-        UINT K = TO_UINT(_pin_K1, _pin_K0);
+        UINT C1 = TO_INVERSE_UINT(_pin_CI);
+        UINT R1 = TO_INVERSE_UINT(_pin_RI);
+        UINT K = TO_INVERSE_UINT(_pin_K1, _pin_K0);
 
         UINT C0 = 0U;
         UINT R0 = 0U;
@@ -176,17 +175,17 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
         }
         _AC = *Rn_AT;
 
-        UINT a0 = TO_UINT(_pin_M0);
-        UINT a1 = TO_UINT(_pin_M1);
-        UINT b0 = TO_UINT(_pin_I0) & TO_UINT(_pin_K0);
-        UINT b1 = TO_UINT(_pin_I1) & TO_UINT(_pin_K1);
+        UINT a0 = TO_INVERSE_UINT(_pin_M0);
+        UINT a1 = TO_INVERSE_UINT(_pin_M1);
+        UINT b0 = TO_INVERSE_UINT(_pin_I0) & TO_INVERSE_UINT(_pin_K0);
+        UINT b1 = TO_INVERSE_UINT(_pin_I1) & TO_INVERSE_UINT(_pin_K1);
 
         UINT X = a0 & b0 | a1 & b1;
         UINT Y = a1 & b1 | a0 & b1 | b0 & b1 | a0 & a1;
 
         /// Setting the states to outputs.
-        SET_STATE(C0 != 0U, _pin_C0, time);
-        SET_STATE(R0 != 0U, _pin_R0, time);
+        SET_STATE(C0 == 0U, _pin_C0, time);
+        SET_STATE(R0 == 0U, _pin_R0, time);
         SET_STATE(X != 0U, _pin_X, time);
         SET_STATE(Y != 0U, _pin_Y, time);
 
@@ -194,16 +193,16 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
             SET_STATE(false, _pin_A0, time);
             SET_STATE(false, _pin_A1, time);
         } else {
-            SET_STATE((_PA & 1) != 0U, _pin_A0, time);
-            SET_STATE((_PA & 2) != 0U, _pin_A1, time);
+            SET_STATE((_PA & 1) == 0U, _pin_A0, time);
+            SET_STATE((_PA & 2) == 0U, _pin_A1, time);
         }
 
         if (ishigh(_pin_ED->getstate())) {
             SET_STATE(false, _pin_D0, time);
             SET_STATE(false, _pin_D1, time);
         } else {
-            SET_STATE((_AC & 1) != 0U, _pin_D0, time);
-            SET_STATE((_AC & 2) != 0U, _pin_D1, time);
+            SET_STATE((_AC & 1) == 0U, _pin_D0, time);
+            SET_STATE((_AC & 2) == 0U, _pin_D1, time);
         }
     }
 }
@@ -244,25 +243,22 @@ UINT I3000_589IK02_Model::TO_UINT(IDSIMPIN * p4, IDSIMPIN * p2, IDSIMPIN * p1)
     return res;
 }
 
-UINT I3000_589IK02_Model::TO_UINT(IDSIMPIN *p2, IDSIMPIN *p1)
-{
+UINT I3000_589IK02_Model::TO_INVERSE_UINT(IDSIMPIN *p2, IDSIMPIN *p1) {
     UINT res = 0U;
-    if (ishigh(p2->istate())) {
+    if (islow(p2->istate())) {
         res += 2U;
     }
-    if (ishigh(p1->istate())) {
+    if (islow(p1->istate())) {
         res += 1U;
     }
     return res;
 }
 
-UINT I3000_589IK02_Model::TO_UINT(IDSIMPIN2 *p) {
-    return ishigh(p->istate()) ? 1U : 0U;
+UINT I3000_589IK02_Model::TO_INVERSE_UINT(IDSIMPIN2 *p) {
+    return islow(p->istate()) ? 1U : 0U;
 }
 
 VOID I3000_589IK02_Model::SET_STATE(bool condition, IDSIMPIN2 *pin, ABSTIME time){
     condition ? pin->setstate(time, details::DELAY, SHI) : pin->setstate(time, details::DELAY, SLO);
 }
-VOID I3000_589IK02_Model::INVERSE_INPUTS() {
-    // mb we need to inverse it?
-}
+
