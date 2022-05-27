@@ -63,7 +63,7 @@ VOID I3000_589IK02_Model::setup(IINSTANCE* instance, IDSIMCKT* dsimckt) {
     _pin_D0->setstate(SLO);
     _pin_D1->setstate(SLO);
 
-    for (UINT& _ron: _rons) { _ron = 0U; }
+    for (UINT& _ron : _rons) { _ron = 0U; }
     _T = 0;
     _PA = 0;
     _AC = 0;
@@ -87,14 +87,15 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
 
         // Choosing Rn_AT or AT.
         UINT* Rn_AT;
-        for (UINT& _ron: _rons) {
+        for (UINT& _ron : _rons) {
             if (_ron == F_group) { Rn_AT = &_ron; }
         }
 
         if (R_group > 9U) {
             if ((R_group & 1U) != 0U) {
                 Rn_AT = &_AC;
-            } else {
+            }
+            else {
                 Rn_AT = &_T;
             }
         }
@@ -103,7 +104,8 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
 
         if (R_group == 10U || R_group == 11U) {
             Rn_M_AT = TO_INVERSE_UINT(_pin_M1, _pin_M0);
-        } else {
+        }
+        else {
             Rn_M_AT = *Rn_AT;
         }
 
@@ -111,7 +113,8 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
         UINT B_AC;
         if (R_group < 14U) {
             B_AC = _AC;
-        } else {
+        }
+        else {
             B_AC = TO_INVERSE_UINT(_pin_I1, _pin_I0);
         }
 
@@ -125,47 +128,49 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
         R0 = 0U;
 
         switch (F_group) {
-            case 0:
-                if (R_group < 14U) {
-                    *Rn_AT = Rn_M_AT + B_AC + C1;
-                } else {
-                    R0 = 1 & Rn_M_AT & !B_AC;
-                    *Rn_AT = 2U & ((R1 << 1U) | (B_AC & Rn_M_AT));
-                    *Rn_AT |= 1U & ((Rn_M_AT & B_AC) | ((Rn_M_AT & B_AC) >> 1U));
-                }
-                break;
-            case 1:
-                if (R_group < 14) {
-                    _PA = K | Rn_M_AT;
-                    *Rn_AT = Rn_M_AT + K + C1;
-                } else {
-                    *Rn_AT = (!Rn_M_AT | K) + (Rn_M_AT & K) + C1;
-                }
-                break;
-            case 2:
-                *Rn_AT = B_AC - 1U + C1;
-                break;
-            case 3:
-                *Rn_AT = Rn_M_AT + B_AC + C1;
-                break;
-            case 4:
-                C0 = C1 | (Rn_M_AT & B_AC);
-                *Rn_AT = Rn_M_AT & B_AC;
-                break;
-            case 5:
-                C0 = C1 | (Rn_M_AT & K);
-                *Rn_AT = K & Rn_M_AT;
-                break;
-            case 6:
-                C0 = C1 | B_AC;
-                *Rn_AT = Rn_M_AT & B_AC;
-                break;
-            case 7:
-                C0 = C1 | (Rn_M_AT & B_AC);
-                *Rn_AT = !(Rn_M_AT ^ B_AC);
-                break;
-            default:
-                break;
+        case 0:
+            if (R_group < 14U) {
+                *Rn_AT = (Rn_M_AT + B_AC + C1) % 4;
+            }
+            else {
+                R0 = 1 & Rn_M_AT & !B_AC;
+                *Rn_AT = 2U & ((R1 << 1U) | (B_AC & Rn_M_AT));
+                *Rn_AT |= 1U & ((Rn_M_AT & B_AC) | ((Rn_M_AT & B_AC) >> 1U));
+            }
+            break;
+        case 1:
+            if (R_group < 14) {
+                _PA = K | Rn_M_AT;
+                *Rn_AT = (Rn_M_AT + K + C1) % 4;
+            }
+            else {
+                *Rn_AT = ((!Rn_M_AT | K) + (Rn_M_AT & K) + C1) % 4;
+            }
+            break;
+        case 2:
+            *Rn_AT = (B_AC - 1U + C1) % 4;
+            break;
+        case 3:
+            *Rn_AT = (Rn_M_AT + B_AC + C1) % 4;
+            break;
+        case 4:
+            C0 = C1 | (Rn_M_AT & B_AC);
+            *Rn_AT = Rn_M_AT & B_AC;
+            break;
+        case 5:
+            C0 = C1 | (Rn_M_AT & K);
+            *Rn_AT = K & Rn_M_AT;
+            break;
+        case 6:
+            C0 = C1 | B_AC;
+            *Rn_AT = Rn_M_AT & B_AC;
+            break;
+        case 7:
+            C0 = C1 | (Rn_M_AT & B_AC);
+            *Rn_AT = !(Rn_M_AT ^ B_AC);
+            break;
+        default:
+            break;
         }
         _AC = *Rn_AT;
 
@@ -180,7 +185,8 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
         if (ishigh(_pin_EA->getstate())) {
             A0 = 0U;
             A1 = 0U;
-        } else {
+        }
+        else {
             A0 = ~_PA & 1U;
             A1 = ~_PA & 2U;
         }
@@ -188,11 +194,13 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
         if (ishigh(_pin_ED->getstate())) {
             D0 = 0U;
             D1 = 0U;
-        } else {
+        }
+        else {
             D0 = ~_AC & 1U;
             D1 = ~_AC & 2U;
         }
-    } else if (TRUE == prev_state && !_pin_CLK->isposedge()) {
+    }
+    else if (TRUE == prev_state && !_pin_CLK->isposedge()) {
         /// Setting the states to outputs.
         SET_STATE(C0 == 0U, _pin_C0, time);
         SET_STATE(R0 == 0U, _pin_R0, time);
