@@ -63,9 +63,7 @@ VOID I3000_589IK02_Model::setup(IINSTANCE* instance, IDSIMCKT* dsimckt) {
     _pin_D0->setstate(SLO);
     _pin_D1->setstate(SLO);
 
-    for (UINT &_ron : _rons) {
-        _ron = 0U;
-    }
+    for (UINT& _ron: _rons) { _ron = 0U; }
     _T = 0;
     _PA = 0;
     _AC = 0;
@@ -80,7 +78,7 @@ BOOL I3000_589IK02_Model::indicate(REALTIME time, ACTIVEDATA* newstate) {
 }
 
 VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
-    if (_pin_CLK->isposedge()) {
+    if (FALSE == prev_state && _pin_CLK->isposedge()) {
 
         // R-GROUP
         UINT R_group = TO_UINT(_pin_F3, _pin_F2, _pin_F1, _pin_F0);
@@ -89,14 +87,12 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
 
         // Choosing Rn_AT or AT.
         UINT* Rn_AT;
-        for (UINT & _ron : _rons) {
-            if (_ron == F_group) {
-                Rn_AT = &_ron;
-            }
+        for (UINT& _ron: _rons) {
+            if (_ron == F_group) { Rn_AT = &_ron; }
         }
 
-        if (R_group > 9) {
-            if ((R_group & 1) != 0) {
+        if (R_group > 9U) {
+            if ((R_group & 1U) != 0U) {
                 Rn_AT = &_AC;
             } else {
                 Rn_AT = &_T;
@@ -105,7 +101,7 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
 
         UINT Rn_M_AT;
 
-        if (R_group == 10 || R_group == 11) {
+        if (R_group == 10U || R_group == 11U) {
             Rn_M_AT = TO_INVERSE_UINT(_pin_M1, _pin_M0);
         } else {
             Rn_M_AT = *Rn_AT;
@@ -113,31 +109,29 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
 
         // Choosing B or AC.
         UINT B_AC;
-        if (R_group < 14) {
+        if (R_group < 14U) {
             B_AC = _AC;
         } else {
             B_AC = TO_INVERSE_UINT(_pin_I1, _pin_I0);
         }
 
-        if (F_group > 1) {
-            B_AC = B_AC & TO_INVERSE_UINT(_pin_K1, _pin_K0);
-        }
+        if (F_group > 1U) { B_AC = B_AC & TO_INVERSE_UINT(_pin_K1, _pin_K0); }
 
         UINT C1 = TO_INVERSE_UINT(_pin_CI);
         UINT R1 = TO_INVERSE_UINT(_pin_RI);
         UINT K = TO_INVERSE_UINT(_pin_K1, _pin_K0);
 
-        UINT C0 = 0U;
-        UINT R0 = 0U;
+        C0 = 0U;
+        R0 = 0U;
 
         switch (F_group) {
             case 0:
-                if (R_group < 14) {
+                if (R_group < 14U) {
                     *Rn_AT = Rn_M_AT + B_AC + C1;
                 } else {
                     R0 = 1 & Rn_M_AT & !B_AC;
-                    *Rn_AT = 2 & ((R1 << 1) | (B_AC & Rn_M_AT));
-                    *Rn_AT |= 1 & ((Rn_M_AT & B_AC) | ((Rn_M_AT & B_AC) >> 1));
+                    *Rn_AT = 2U & ((R1 << 1U) | (B_AC & Rn_M_AT));
+                    *Rn_AT |= 1U & ((Rn_M_AT & B_AC) | ((Rn_M_AT & B_AC) >> 1U));
                 }
                 break;
             case 1:
@@ -180,85 +174,71 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
         UINT b0 = TO_INVERSE_UINT(_pin_I0) & TO_INVERSE_UINT(_pin_K0);
         UINT b1 = TO_INVERSE_UINT(_pin_I1) & TO_INVERSE_UINT(_pin_K1);
 
-        UINT X = a0 & b0 | a1 & b1;
-        UINT Y = a1 & b1 | a0 & b1 | b0 & b1 | a0 & a1;
+        /*UINT*/ X = a0 & b0 | a1 & b1;
+        /*UINT*/ Y = a1 & b1 | a0 & b1 | b0 & b1 | a0 & a1;
 
+        if (ishigh(_pin_EA->getstate())) {
+            A0 = 0U;
+            A1 = 0U;
+        } else {
+            A0 = ~_PA & 1U;
+            A1 = ~_PA & 2U;
+        }
+
+        if (ishigh(_pin_ED->getstate())) {
+            D0 = 0U;
+            D1 = 0U;
+        } else {
+            D0 = ~_AC & 1U;
+            D1 = ~_AC & 2U;
+        }
+    } else if (TRUE == prev_state && !_pin_CLK->isposedge()) {
         /// Setting the states to outputs.
         SET_STATE(C0 == 0U, _pin_C0, time);
         SET_STATE(R0 == 0U, _pin_R0, time);
         SET_STATE(X != 0U, _pin_X, time);
         SET_STATE(Y != 0U, _pin_Y, time);
 
-        if (ishigh(_pin_EA->getstate())) {
-            SET_STATE(false, _pin_A0, time);
-            SET_STATE(false, _pin_A1, time);
-        } else {
-            SET_STATE((_PA & 1) == 0U, _pin_A0, time);
-            SET_STATE((_PA & 2) == 0U, _pin_A1, time);
-        }
-
-        if (ishigh(_pin_ED->getstate())) {
-            SET_STATE(false, _pin_D0, time);
-            SET_STATE(false, _pin_D1, time);
-        } else {
-            SET_STATE((_AC & 1) == 0U, _pin_D0, time);
-            SET_STATE((_AC & 2) == 0U, _pin_D1, time);
-        }
+        SET_STATE(A0 != 0U, _pin_A0, time);
+        SET_STATE(A1 != 0U, _pin_A1, time);
+        SET_STATE(D0 != 0U, _pin_D0, time);
+        SET_STATE(D1 != 0U, _pin_D1, time);
     }
+
+    prev_state = _pin_CLK->isposedge();
 }
 
 VOID I3000_589IK02_Model::callback(ABSTIME time, EVENTID eventid) {}
 
 
-UINT I3000_589IK02_Model::TO_UINT(IDSIMPIN * p8, IDSIMPIN * p4, IDSIMPIN * p2, IDSIMPIN * p1)
-{
+UINT I3000_589IK02_Model::TO_UINT(IDSIMPIN* p8, IDSIMPIN* p4, IDSIMPIN* p2, IDSIMPIN* p1) {
     UINT res = 0U;
-    if (ishigh(p8->istate())) {
-        res += 8U;
-    }
-    if (ishigh(p4->istate())) {
-        res += 4U;
-    }
-    if (ishigh(p2->istate())) {
-        res += 2U;
-    }
-    if (ishigh(p1->istate())) {
-        res += 1U;
-    }
+    if (ishigh(p8->istate())) { res += 8U; }
+    if (ishigh(p4->istate())) { res += 4U; }
+    if (ishigh(p2->istate())) { res += 2U; }
+    if (ishigh(p1->istate())) { res += 1U; }
     return res;
 }
 
-UINT I3000_589IK02_Model::TO_UINT(IDSIMPIN * p4, IDSIMPIN * p2, IDSIMPIN * p1)
-{
+UINT I3000_589IK02_Model::TO_UINT(IDSIMPIN* p4, IDSIMPIN* p2, IDSIMPIN* p1) {
     UINT res = 0U;
-    if (ishigh(p4->istate())) {
-        res += 4U;
-    }
-    if (ishigh(p2->istate())) {
-        res += 2U;
-    }
-    if (ishigh(p1->istate())) {
-        res += 1U;
-    }
+    if (ishigh(p4->istate())) { res += 4U; }
+    if (ishigh(p2->istate())) { res += 2U; }
+    if (ishigh(p1->istate())) { res += 1U; }
     return res;
 }
 
-UINT I3000_589IK02_Model::TO_INVERSE_UINT(IDSIMPIN *p2, IDSIMPIN *p1) {
+UINT I3000_589IK02_Model::TO_INVERSE_UINT(IDSIMPIN* p2, IDSIMPIN* p1) {
     UINT res = 0U;
-    if (islow(p2->istate())) {
-        res += 2U;
-    }
-    if (islow(p1->istate())) {
-        res += 1U;
-    }
+    if (islow(p2->istate())) { res += 2U; }
+    if (islow(p1->istate())) { res += 1U; }
     return res;
 }
 
-UINT I3000_589IK02_Model::TO_INVERSE_UINT(IDSIMPIN2 *p) {
+UINT I3000_589IK02_Model::TO_INVERSE_UINT(IDSIMPIN2* p) {
     return islow(p->istate()) ? 1U : 0U;
 }
 
-VOID I3000_589IK02_Model::SET_STATE(bool condition, IDSIMPIN2 *pin, ABSTIME time){
+VOID I3000_589IK02_Model::SET_STATE(bool condition, IDSIMPIN2* pin, ABSTIME time) {
     condition ? pin->setstate(time, details::DELAY, SHI) : pin->setstate(time, details::DELAY, SLO);
 }
-

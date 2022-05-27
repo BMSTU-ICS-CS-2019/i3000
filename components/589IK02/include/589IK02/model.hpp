@@ -16,8 +16,8 @@
 
 #include <i3000/prelude.hpp>
 
-namespace details{
-    const RELTIME DELAY = 50'000 ;
+namespace details {
+    const RELTIME DELAY = 50'000;
 }
 
 class I3000_589IK02_Model : public IDSIMMODEL {
@@ -56,20 +56,32 @@ private:
     IDSIMPIN* _pin_D1;
 
     // REGISTERS
-    UINT _rons[10]; // R0-R9
-    UINT _T = 0; // R10
-    UINT _PA = 0; // address register
-    UINT _AC = 0; // battery register
+    UINT _rons[10];// R0-R9
+    UINT _T = 0U;  // R10
+    UINT _PA = 0U; // address register
+    UINT _AC = 0U; // battery register
+
+    //OUTPUTS
+    UINT R0 = 0U;
+    UINT C0 = 0U;
+    UINT X = 0U;
+    UINT Y = 0U;
+    UINT A0 = 0U;
+    UINT A1 = 0U;
+    UINT D0 = 0U;
+    UINT D1 = 0U;
+
+    BOOL prev_state = FALSE;
 
     static UINT TO_UINT(IDSIMPIN* p8, IDSIMPIN* p4, IDSIMPIN* p2, IDSIMPIN* p1);
 
     static UINT TO_UINT(IDSIMPIN* p4, IDSIMPIN* p2, IDSIMPIN* p1);
 
-    static UINT TO_INVERSE_UINT(IDSIMPIN *p2, IDSIMPIN *p1);
+    static UINT TO_INVERSE_UINT(IDSIMPIN* p2, IDSIMPIN* p1);
 
-    static UINT TO_INVERSE_UINT(IDSIMPIN2 *p);
+    static UINT TO_INVERSE_UINT(IDSIMPIN2* p);
 
-    static VOID SET_STATE(bool condition, IDSIMPIN2 *pin, ABSTIME time);
+    static VOID SET_STATE(bool condition, IDSIMPIN2* pin, ABSTIME time);
 
 
 public:
