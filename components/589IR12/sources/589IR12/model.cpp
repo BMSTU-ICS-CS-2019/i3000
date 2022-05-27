@@ -46,9 +46,6 @@ VOID I3000_589IR12_Model::setup(IINSTANCE* instance, IDSIMCKT* dsim) {
     _pin_Q7= instance->getdsimpin("Q7", true);
     _pin_Q8 = instance->getdsimpin("Q8", true);
 
-    _pin_UCC = instance->getdsimpin("UCC", true);
-    _pin_GND = instance->getdsimpin("GND", true);
-
     _pin_INR->setstate(SLO);
     _pin_Q1->setstate(SLO);
     _pin_Q2->setstate(SLO);
