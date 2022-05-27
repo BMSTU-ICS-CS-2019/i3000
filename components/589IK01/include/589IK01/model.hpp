@@ -17,7 +17,7 @@
 #include <i3000/prelude.hpp>
 
 namespace details{
-    const RELTIME DELAY = 50'000;
+    const RELTIME DELAY = 100'000;
 }
 
 class I3000_589IK01_Model : public IDSIMMODEL {
@@ -70,7 +70,7 @@ private:
 
     BOOL _previous_CLK_state = false;
 
-    enum MicroOperation{
+    enum MicroOperationMnemonic {
         JCC,
         JZR,
         JCR,
@@ -83,143 +83,47 @@ private:
         JPX,
         JRL,
     };
+    enum FlagInputMnemonic {
+        SCZ,
+        STZ,
+        STC,
+        HCZ,
+    };
+    enum FlagOutputMnemonic{
+        FF0,
+        FFC,
+        FFZ,
+        FF1
+    };
 
-    MicroOperation get_micro_operation() const {
-        if (IS_LOW(_pin_AC6) && IS_LOW(_pin_AC5)){
-            return JCC;
-        }
-        if (IS_LOW(_pin_AC6) && IS_HIGH(_pin_AC5) && IS_LOW(_pin_AC4)){
-            return JZR;
-        }
-        if (IS_LOW(_pin_AC6) && IS_HIGH(_pin_AC5) && IS_HIGH(_pin_AC4)){
-            return JCR;
-        }
-        if (IS_HIGH(_pin_AC6) && IS_LOW(_pin_AC5) && IS_LOW(_pin_AC4)){
-            return JFL;
-        }
-        if (IS_HIGH(_pin_AC6) && IS_LOW(_pin_AC5) && IS_HIGH(_pin_AC4) && IS_LOW(_pin_AC3)){
-            return JCF;
-        }
-        if (IS_HIGH(_pin_AC6) && IS_LOW(_pin_AC5) && IS_HIGH(_pin_AC4) && IS_HIGH(_pin_AC3)) {
-            return JZF;
-        }
-        if (IS_HIGH(_pin_AC6) && IS_HIGH(_pin_AC5) && IS_LOW(_pin_AC4) && IS_LOW(_pin_AC3)) {
-            return JPR;
-        }
-        if (IS_HIGH(_pin_AC6) && IS_HIGH(_pin_AC5) && IS_LOW(_pin_AC4) && IS_HIGH(_pin_AC3)) {
-            return JLL;
-        }
-        if (IS_HIGH(_pin_AC6) && IS_HIGH(_pin_AC5) && IS_HIGH(_pin_AC4) && IS_LOW(_pin_AC3)) {
-            return JCE;
-        }
-        if (IS_HIGH(_pin_AC6) && IS_HIGH(_pin_AC5) && IS_HIGH(_pin_AC4) && IS_HIGH(_pin_AC3) && IS_LOW(_pin_AC2)){
-            return JPX;
-        }
-        if (IS_HIGH(_pin_AC6) && IS_HIGH(_pin_AC5) && IS_HIGH(_pin_AC4) && IS_HIGH(_pin_AC3) && IS_HIGH(_pin_AC2)) {
-            return JRL;
-        }
-        throw 42;
-    }
+    MicroOperationMnemonic get_micro_operation() const;
 
-    VOID RUN_JCC(){
-        SET_STATE(IS_HIGH(_pin_AC0), _pin_A4);
-        SET_STATE(IS_HIGH(_pin_AC1), _pin_A5);
-        SET_STATE(IS_HIGH(_pin_AC2), _pin_A6);
-        SET_STATE(IS_HIGH(_pin_AC3), _pin_A7);
-        SET_STATE(IS_HIGH(_pin_AC4), _pin_A8);
-    }
-    VOID RUN_JZR(){
-        SET_STATE(IS_HIGH(_pin_AC0), _pin_A0);
-        SET_STATE(IS_HIGH(_pin_AC1), _pin_A1);
-        SET_STATE(IS_HIGH(_pin_AC2), _pin_A2);
-        SET_STATE(IS_HIGH(_pin_AC3), _pin_A3);
-        SET_STATE(false, _pin_A4);
-        SET_STATE(false, _pin_A5);
-        SET_STATE(false, _pin_A6);
-        SET_STATE(false, _pin_A7);
-        SET_STATE(false, _pin_A8);
-    }
-    VOID RUN_JCR(){
-        SET_STATE(IS_HIGH(_pin_AC0), _pin_A0);
-        SET_STATE(IS_HIGH(_pin_AC1), _pin_A1);
-        SET_STATE(IS_HIGH(_pin_AC2), _pin_A2);
-        SET_STATE(IS_HIGH(_pin_AC3), _pin_A3);
-    }
-    VOID RUN_JFL(){
-        SET_STATE(_F, _pin_A0);
-        SET_STATE(true, _pin_A1);
-        SET_STATE(false, _pin_A2);
-        SET_STATE(IS_HIGH(_pin_AC0), _pin_A4);
-        SET_STATE(IS_HIGH(_pin_AC1), _pin_A5);
-        SET_STATE(IS_HIGH(_pin_AC2), _pin_A6);
-        SET_STATE(IS_HIGH(_pin_AC3), _pin_A7);
-    }
-
-    VOID RUN_JCF(){
-        SET_STATE(_C, _pin_A0);
-        SET_STATE(true, _pin_A1);
-        SET_STATE(false, _pin_A2);
-        SET_STATE(IS_HIGH(_pin_AC0), _pin_A4);
-        SET_STATE(IS_HIGH(_pin_AC1), _pin_A5);
-        SET_STATE(IS_HIGH(_pin_AC2), _pin_A6);
-    }
-    VOID RUN_JZF(){
-        SET_STATE(_Z, _pin_A0);
-        SET_STATE(true, _pin_A1);
-        SET_STATE(false, _pin_A2);
-        SET_STATE(IS_HIGH(_pin_AC0), _pin_A4);
-        SET_STATE(IS_HIGH(_pin_AC1), _pin_A5);
-        SET_STATE(IS_HIGH(_pin_AC2), _pin_A6);
-    }
-    VOID RUN_JPR(){
-        SET_STATE(_PR_latch[0], _pin_A0);
-        SET_STATE(_PR_latch[1], _pin_A1);
-        SET_STATE(_PR_latch[2], _pin_A2);
-        SET_STATE(_PR_latch[3], _pin_A3);
-        SET_STATE(IS_HIGH(_pin_AC0), _pin_A4);
-        SET_STATE(IS_HIGH(_pin_AC1), _pin_A5);
-        SET_STATE(IS_HIGH(_pin_AC2), _pin_A6);
-    }
-    VOID RUN_JLL(){
-        SET_STATE(_PR_latch[2], _pin_A0);
-        SET_STATE(_PR_latch[3], _pin_A1);
-        SET_STATE(true, _pin_A2);
-        SET_STATE(false,  _pin_A3);
-        SET_STATE(IS_HIGH(_pin_AC0), _pin_A4);
-        SET_STATE(IS_HIGH(_pin_AC1), _pin_A5);
-        SET_STATE(IS_HIGH(_pin_AC2), _pin_A6);
-    }
-    VOID RUN_JCE(){
-        SET_STATE(IS_HIGH(_pin_AC0), _pin_A4);
-        SET_STATE(IS_HIGH(_pin_AC1), _pin_A5);
-        SET_STATE(IS_HIGH(_pin_AC2), _pin_A6);
-    }
-    VOID RUN_JPX(){
-        SET_STATE(IS_HIGH(_pin_K4), _pin_A0);
-        SET_STATE(IS_HIGH(_pin_K5), _pin_A1);
-        SET_STATE(IS_HIGH(_pin_K6), _pin_A2);
-        SET_STATE(IS_HIGH(_pin_K7), _pin_A3);
-        SET_STATE(IS_HIGH(_pin_AC0), _pin_A4);
-        SET_STATE(IS_HIGH(_pin_AC1), _pin_A5);
-    }
-    VOID RUN_JRL(){
-        SET_STATE(_PR_latch[0], _pin_A0);
-        SET_STATE(_PR_latch[1], _pin_A1);
-        SET_STATE(true, _pin_A2);
-        SET_STATE(true,  _pin_A3);
-        SET_STATE(IS_HIGH(_pin_AC0), _pin_A4);
-        SET_STATE(IS_HIGH(_pin_AC1), _pin_A5);
-        SET_STATE(true,  _pin_A6);
-    }
+    VOID RUN_JCC();
+    VOID RUN_JZR();
+    VOID RUN_JCR();
+    VOID RUN_JFL();
+    VOID RUN_JCF();
+    VOID RUN_JZF();
+    VOID RUN_JPR();
+    VOID RUN_JLL();
+    VOID RUN_JCE();
+    VOID RUN_JPX();
+    VOID RUN_JRL();
     // TRIGGERS
     bool _F = false;
     bool _C = false;
     bool _Z = false;
 
-    BOOL _PR_latch[4] = {false, false, false, false};
+    BOOL _PR_latch[4];
 
-
-    static VOID SET_STATE(bool condition, IDSIMPIN2 *pin, ABSTIME time = details::DELAY);
+    void set_flags();
+    void output_flags();
+    void set_PR_latch();
+    void output_logic_A();
+    void output_K_A();
+    FlagInputMnemonic get_flag_input_mnemonic() const;
+    FlagOutputMnemonic get_flag_output_mnemonic() const;
+    VOID SET_STATE(bool condition, IDSIMPIN2 *pin, ABSTIME time = details::DELAY);
     static BOOL IS_HIGH(IDSIMPIN * pin);
     static BOOL IS_LOW(IDSIMPIN * pin);
 public:
