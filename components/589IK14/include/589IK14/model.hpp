@@ -18,9 +18,6 @@
 
 class I3000_589IK14_Model : public IDSIMMODEL {
 private:
-    // INSTANCE
-    IINSTANCE* _instance;
-
     // INPUT PINS
     IDSIMPIN* _pin_INE;
     IDSIMPIN* _pin_CLK;
@@ -47,6 +44,19 @@ private:
     IDSIMPIN* _pin_GE;
     IDSIMPIN* _pin_IA;
 
+    // registers
+
+    // requested interruption
+    BYTE _rgr = 0;
+    BOOL _rgr_ANY = false;
+
+    // priority
+    BYTE _rgs = 0;
+    BOOL _rgs_GS = false;
+
+    // synthetic trigger
+    BOOL _block_trigger_inverted = true;
+
 public:
     static constexpr DWORD MODEL_KEY = 0x00000000;
 
@@ -63,4 +73,9 @@ public:
     VOID simulate(ABSTIME time, DSIMMODES mode) override;
 
     VOID callback(ABSTIME time, EVENTID eventid) override;
+
+private:
+    VOID _update_rgr();
+
+    VOID _update_rgs();
 };
