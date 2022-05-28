@@ -115,12 +115,13 @@ private:
     bool _Z = false;
 
     BOOL _PR_latch[4];
-
+    BOOL _A_values[9];
     void set_flags();
     void output_flags();
     void set_PR_latch();
     void output_logic_A();
     void output_K_A();
+    void save_state(bool condition, IDSIMPIN2 *pin);
     FlagInputMnemonic get_flag_input_mnemonic() const;
     FlagOutputMnemonic get_flag_output_mnemonic() const;
     VOID SET_STATE(bool condition, IDSIMPIN2 *pin, ABSTIME time = details::DELAY);

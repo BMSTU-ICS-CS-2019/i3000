@@ -15,14 +15,14 @@
 #include <i3000/prelude.hpp>
 
 #include <589IK01/model.hpp>
-#include <string>
+#include <iostream>
 
 extern "C" {
     IDSIMMODEL __declspec(dllexport) * createdsimmodel(CHAR* device, ILICENCESERVER* license_server) {
         MessageBox(nullptr, reinterpret_cast<LPCSTR>("Compile Time " __DATE__ " " __TIME__),
                    reinterpret_cast<LPCSTR>("Hello!"),
                    MB_ICONERROR);
-        int c = 1;
+//        std::cout<<__DATE__<<std::endl;
         return license_server->authorize(I3000_589IK01_Model::MODEL_KEY) ? new I3000_589IK01_Model() : nullptr;
     }
 
