@@ -18,8 +18,10 @@
 
 extern "C" {
     IDSIMMODEL __declspec(dllexport) * createdsimmodel(CHAR* device, ILICENCESERVER* license_server) {
-//        MessageBox(nullptr, reinterpret_cast<LPCSTR>(L"Hi there, Hello!"),
-//                   reinterpret_cast<LPCSTR>(L"It's me, I'm the Adstronaut!"), MB_ICONERROR);
+        MessageBox(nullptr, reinterpret_cast<LPCSTR>("Compile Time " __DATE__ " " __TIME__),
+                   reinterpret_cast<LPCSTR>("Hello from 589IK02 Dev Team!"),
+                   MB_ICONERROR);
+        //        std::cout<<__DATE__<<std::endl;
         return license_server->authorize(I3000_589IK02_Model::MODEL_KEY) ? new I3000_589IK02_Model() : nullptr;
     }
 
