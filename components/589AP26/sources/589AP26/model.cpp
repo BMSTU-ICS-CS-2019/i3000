@@ -85,5 +85,5 @@ VOID I3000_589AP26_Model::simulate(ABSTIME time, DSIMMODES mode) {
 VOID I3000_589AP26_Model::callback(ABSTIME time, EVENTID eventid) {}
 
 VOID I3000_589AP26_Model::SET_STATE(bool condition, IDSIMPIN2 *pin, ABSTIME time) {
-    condition ? pin->setstate(time, details::DELAY, SHI) : pin->setstate(time, details::DELAY, SLO);
+    pin->setstate(time, details::DELAY, condition ? SHI : SLO);
 }
