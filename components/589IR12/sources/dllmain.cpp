@@ -12,10 +12,20 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-#pragma once
+#include <i3000/prelude.hpp>
 
-#include <sdkddkver.h>
+#include <589IR12/model.hpp>
 
-#include <Windows.h>
+extern "C" {
+    IDSIMMODEL __declspec(dllexport) * createdsimmodel(CHAR* device, ILICENCESERVER* license_server) {
+        return license_server->authorize(I3000_589IR12_Model::MODEL_KEY) ? new I3000_589IR12_Model() : nullptr;
+    }
 
-#include <vsmsdk/vsm.hpp>
+    VOID __declspec(dllexport) deletedsimmodel(IDSIMMODEL* model) {
+        delete (I3000_589IR12_Model*) model;
+    }
+}
+
+BOOL WINAPI DllMain(HMODULE hmodule, DWORD call_reason, [[maybe_unused]] LPVOID _reserved) {
+    return TRUE;
+}
