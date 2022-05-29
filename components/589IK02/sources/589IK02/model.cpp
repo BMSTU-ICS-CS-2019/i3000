@@ -127,10 +127,12 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
         C0 = 0U;
         R0 = 0U;
 
+        int case2_result = 0U;
         switch (F_group) {
             case 0:
                 _instance->log("589IK02: in case 0");
                 if (R_group < 14U) {
+                    if ((Rn_M_AT + (_AC & K) + C1) > 3U) { C0 = 1U; }
                     *Rn_AT = (Rn_M_AT + (_AC & K) + C1) % 4;
                     if (R_group != 10U) { _AC = *Rn_AT; }
                 } else {
@@ -143,6 +145,7 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
                 _instance->log("589IK02: in case 1");
                 if (R_group < 14) {
                     _PA = K | Rn_M_AT;
+                    if ((Rn_M_AT + K + C1) > 3U) { C0 = 1U; }
                     *Rn_AT = (Rn_M_AT + K + C1) % 4;
                 } else {
                     *Rn_AT = ((~Rn_M_AT | K) + (Rn_M_AT & K) + C1) % 4;
@@ -150,10 +153,17 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
                 break;
             case 2:
                 _instance->log("589IK02: in case 2");
-                *Rn_AT = (B_AC - 1U + C1) % 4;
+                case2_result = B_AC - 1U + C1;
+                if (case2_result < 0U) {
+                    C0 = 1U;
+                    case2_result += 4;
+                }
+                *Rn_AT = case2_result;
                 break;
             case 3:
                 _instance->log("589IK02: in case 3");
+
+                if ((Rn_M_AT + B_AC + C1) > 3U) { C0 = 1U; }
                 *Rn_AT = (Rn_M_AT + B_AC + C1) % 4;
                 break;
             case 4:
