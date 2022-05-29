@@ -39,7 +39,6 @@ private:
     IDSIMPIN* _pin_CS2;
     IDSIMPIN* _pin_MD;
     IDSIMPIN* _pin_EW;
-    IDSIMPIN* _pin_GND;
 
     // OUTPUT PINS
     IDSIMPIN* _pin_INR;
@@ -51,7 +50,6 @@ private:
     IDSIMPIN* _pin_Q6;
     IDSIMPIN* _pin_Q7;
     IDSIMPIN* _pin_Q8;
-    IDSIMPIN* _pin_UCC;
 
 public:
     static constexpr DWORD MODEL_KEY = 0x00000000;

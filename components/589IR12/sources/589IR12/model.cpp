@@ -84,10 +84,10 @@ VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
     /// Сигнал стробирования
     if (islow(_pin_EW->getstate())) return;
 
-    BOOL SELECTED = islow(_pin_CS1->getstate()) && ishigh(_pin_CS2->getstate());
+    BOOL selected = islow(_pin_CS1->getstate()) && ishigh(_pin_CS2->getstate());
 
     /// Триггер запроса прерывания устанавливается в 1 при условии выбора устройства
-    if (SELECTED) {
+    if (selected) {
         _pin_INR->setstate(SHI);
     }
 
@@ -99,14 +99,11 @@ VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
      * При наличии лог. 1 на входе MD устройство работает в режиме вывода.
      * В этом случае выходные буферные каскады открыты независимо от выборки устройства.
      */
-    if (ishigh(_pin_MD->getstate())) {
-
-        return;
-    }
+    if (ishigh(_pin_MD->getstate())) { return; }
 
     /// MD=0 (режим ввода)
     /// При наличии лог. 0 иа входе CS1 н лог. 1 иа входе CS2 устройство выбрано.
-    if (SELECTED) {
+    if (selected) {
         _pin_Q1->setstate(_pin_D1->getstate());
         _pin_Q2->setstate(_pin_D2->getstate());
         _pin_Q3->setstate(_pin_D3->getstate());
