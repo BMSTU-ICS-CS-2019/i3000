@@ -110,9 +110,9 @@ private:
     VOID RUN_JPX();
     VOID RUN_JRL();
     // TRIGGERS
-    bool _F = false;
-    bool _C = false;
-    bool _Z = false;
+    BOOL _F = false;
+    BOOL _C = false;
+    BOOL _Z = false;
 
     BOOL _PR_latch[4];
     BOOL _A_values[9];

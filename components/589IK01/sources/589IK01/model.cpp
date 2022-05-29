@@ -93,18 +93,15 @@ BOOL I3000_589IK01_Model::indicate(REALTIME time, ACTIVEDATA* newstate) {
 
 VOID I3000_589IK01_Model::simulate(ABSTIME time, DSIMMODES mode) {
     if (_pin_CLK->isposedge()) {
-        //        if (_previous_CLK_state == false) {
         // Фронт
+        output_flags();
+    } else if (_pin_CLK->isnegedge()) {
         if (IS_HIGH(_pin_EWA)) {
             output_K_A();
         } else {
             output_logic_A();
         }
-        output_flags();
         set_PR_latch();
-        //            _previous_CLK_state = true;
-        //        }
-    } else if (_pin_CLK->isnegedge()) {
         set_flags();
     } else if (IS_LOW(_pin_CLK)) {
         _F = IS_LOW(_pin_FI);
@@ -147,10 +144,6 @@ void I3000_589IK01_Model::set_flags() {
 
 void I3000_589IK01_Model::output_flags() {
     auto flag_mnemonic = get_flag_output_mnemonic();
-#ifdef RK_MESSAGE_BOX
-    MessageBox(nullptr, reinterpret_cast<LPCSTR>(("output_logic_A" + std::to_string(flag_mnemonic)).c_str()),
-               reinterpret_cast<LPCSTR>("Hello!"), MB_ICONERROR);
-#endif
     switch (flag_mnemonic) {
         case FF0:
             SET_STATE(true, _pin_FO);
@@ -159,7 +152,7 @@ void I3000_589IK01_Model::output_flags() {
             SET_STATE(1-_C, _pin_FO);
             break;
         case FFZ:
-            SET_STATE(1-_Z, _pin_FO);
+            SET_STATE( 1-_Z, _pin_FO);
             break;
         case FF1:
             SET_STATE(false, _pin_FO);
@@ -167,10 +160,6 @@ void I3000_589IK01_Model::output_flags() {
     }
 }
 void I3000_589IK01_Model::output_logic_A() {
-#ifdef RK_MESSAGE_BOX
-    MessageBox(nullptr, reinterpret_cast<LPCSTR>("output_logic_A"), reinterpret_cast<LPCSTR>("Hello!"), MB_ICONERROR);
-#endif
-
     auto state = get_micro_operation();
     switch (state) {
         case JCC:
@@ -217,21 +206,12 @@ void I3000_589IK01_Model::output_logic_A() {
     }
 }
 void I3000_589IK01_Model::set_PR_latch() {
-#ifdef RK_MESSAGE_BOX
-    MessageBox(nullptr, reinterpret_cast<LPCSTR>("set_PR_latch"), reinterpret_cast<LPCSTR>("Hel!"), MB_ICONERROR);
-#endif
-
     _PR_latch[0] = IS_LOW(_pin_K0);
     _PR_latch[1] = IS_LOW(_pin_K1);
     _PR_latch[2] = IS_LOW(_pin_K2);
     _PR_latch[3] = IS_LOW(_pin_K3);
 }
 I3000_589IK01_Model::FlagOutputMnemonic I3000_589IK01_Model::get_flag_output_mnemonic() const {
-#ifdef RK_MESSAGE_BOX
-    MessageBox(nullptr, reinterpret_cast<LPCSTR>("get_flag_output_mnemonic"), reinterpret_cast<LPCSTR>("Hello!"),
-               MB_ICONERROR);
-#endif
-
     if (IS_LOW(_pin_FC3) && IS_LOW(_pin_FC2)) {
         return FF0;
     }
@@ -247,11 +227,6 @@ I3000_589IK01_Model::FlagOutputMnemonic I3000_589IK01_Model::get_flag_output_mne
     throw 42;
 }
 I3000_589IK01_Model::FlagInputMnemonic I3000_589IK01_Model::get_flag_input_mnemonic() const {
-#ifdef RK_MESSAGE_BOX
-    MessageBox(nullptr, reinterpret_cast<LPCSTR>("get_flag_input_mnemonic"), reinterpret_cast<LPCSTR>("Hello!"),
-               MB_ICONERROR);
-#endif
-
     if (IS_LOW(_pin_FC1) && IS_LOW(_pin_FC0)) {
         return SCZ;
     }
@@ -267,10 +242,6 @@ I3000_589IK01_Model::FlagInputMnemonic I3000_589IK01_Model::get_flag_input_mnemo
     throw 42;
 }
 void I3000_589IK01_Model::output_K_A() {
-#ifdef RK_MESSAGE_BOX
-    MessageBox(nullptr, reinterpret_cast<LPCSTR>("output_K_A"), reinterpret_cast<LPCSTR>("Hello!"), MB_ICONERROR);
-#endif
-
     SET_STATE(IS_LOW(_pin_K4), _pin_A0);
     SET_STATE(IS_LOW(_pin_K5), _pin_A1);
     SET_STATE(IS_LOW(_pin_K6), _pin_A2);
@@ -283,12 +254,8 @@ void I3000_589IK01_Model::output_K_A() {
         SET_STATE(false, _pin_A8);
     }
     SET_STATE(false, _pin_INE);
-
 }
 VOID I3000_589IK01_Model::RUN_JCC() {
-#ifdef RK_MESSAGE_BOX
-    MessageBox(nullptr, reinterpret_cast<LPCSTR>("JCC"), reinterpret_cast<LPCSTR>("Hello!"), MB_ICONERROR);
-#endif
     if (IS_HIGH(_pin_ERA)) {
         SET_STATE(IS_HIGH(_pin_AC0), _pin_A4);
         SET_STATE(IS_HIGH(_pin_AC1), _pin_A5);
@@ -298,20 +265,12 @@ VOID I3000_589IK01_Model::RUN_JCC() {
     }
 }
 VOID I3000_589IK01_Model::RUN_JCR() {
-#ifdef RK_MESSAGE_BOX
-    MessageBox(nullptr, reinterpret_cast<LPCSTR>("JCR"), reinterpret_cast<LPCSTR>("Hello!"), MB_ICONERROR);
-#endif
-
     SET_STATE(IS_HIGH(_pin_AC0), _pin_A0);
     SET_STATE(IS_HIGH(_pin_AC1), _pin_A1);
     SET_STATE(IS_HIGH(_pin_AC2), _pin_A2);
     SET_STATE(IS_HIGH(_pin_AC3), _pin_A3);
 }
 VOID I3000_589IK01_Model::RUN_JZR() {
-#ifdef RK_MESSAGE_BOX
-    MessageBox(nullptr, reinterpret_cast<LPCSTR>("JZR"), reinterpret_cast<LPCSTR>("Hello!"), MB_ICONERROR);
-#endif
-
     SET_STATE(IS_HIGH(_pin_AC0), _pin_A0);
     SET_STATE(IS_HIGH(_pin_AC1), _pin_A1);
     SET_STATE(IS_HIGH(_pin_AC2), _pin_A2);
@@ -325,10 +284,6 @@ VOID I3000_589IK01_Model::RUN_JZR() {
     }
 }
 VOID I3000_589IK01_Model::RUN_JFL() {
-#ifdef RK_MESSAGE_BOX
-    MessageBox(nullptr, reinterpret_cast<LPCSTR>("JFL"), reinterpret_cast<LPCSTR>("Hello!"), MB_ICONERROR);
-#endif
-
     SET_STATE(_F, _pin_A0);
     SET_STATE(true, _pin_A1);
     SET_STATE(false, _pin_A2);
@@ -340,10 +295,6 @@ VOID I3000_589IK01_Model::RUN_JFL() {
     }
 }
 VOID I3000_589IK01_Model::RUN_JCF() {
-#ifdef RK_MESSAGE_BOX
-    MessageBox(nullptr, reinterpret_cast<LPCSTR>("JCF"), reinterpret_cast<LPCSTR>("Hello!"), MB_ICONERROR);
-#endif
-
     SET_STATE(_C, _pin_A0);
     SET_STATE(true, _pin_A1);
     SET_STATE(false, _pin_A2);
@@ -354,10 +305,6 @@ VOID I3000_589IK01_Model::RUN_JCF() {
     }
 }
 VOID I3000_589IK01_Model::RUN_JZF() {
-#ifdef RK_MESSAGE_BOX
-    MessageBox(nullptr, reinterpret_cast<LPCSTR>("JZF"), reinterpret_cast<LPCSTR>("Hello!"), MB_ICONERROR);
-#endif
-
     SET_STATE(_Z, _pin_A0);
     SET_STATE(true, _pin_A1);
     SET_STATE(false, _pin_A2);
@@ -368,10 +315,6 @@ VOID I3000_589IK01_Model::RUN_JZF() {
     }
 }
 VOID I3000_589IK01_Model::RUN_JPR() {
-#ifdef RK_MESSAGE_BOX
-    MessageBox(nullptr, reinterpret_cast<LPCSTR>("JPR"), reinterpret_cast<LPCSTR>("Hello!"), MB_ICONERROR);
-#endif
-
     SET_STATE(_PR_latch[0], _pin_A0);
     SET_STATE(_PR_latch[1], _pin_A1);
     SET_STATE(_PR_latch[2], _pin_A2);
@@ -383,10 +326,6 @@ VOID I3000_589IK01_Model::RUN_JPR() {
     }
 }
 VOID I3000_589IK01_Model::RUN_JLL() {
-#ifdef RK_MESSAGE_BOX
-    MessageBox(nullptr, reinterpret_cast<LPCSTR>("JLL"), reinterpret_cast<LPCSTR>("Hello!"), MB_ICONERROR);
-#endif
-
     SET_STATE(_PR_latch[2], _pin_A0);
     SET_STATE(_PR_latch[3], _pin_A1);
     SET_STATE(true, _pin_A2);
@@ -398,9 +337,6 @@ VOID I3000_589IK01_Model::RUN_JLL() {
     }
 }
 VOID I3000_589IK01_Model::RUN_JCE() {
-#ifdef RK_MESSAGE_BOX
-    MessageBox(nullptr, reinterpret_cast<LPCSTR>("JCE"), reinterpret_cast<LPCSTR>("Hello!"), MB_ICONERROR);
-#endif
     if (IS_HIGH(_pin_ERA)) {
         SET_STATE(IS_HIGH(_pin_AC0), _pin_A4);
         SET_STATE(IS_HIGH(_pin_AC1), _pin_A5);
@@ -411,10 +347,6 @@ VOID I3000_589IK01_Model::RUN_JCE() {
     SET_STATE(_PR_latch[2], _pin_PK2);
 }
 VOID I3000_589IK01_Model::RUN_JPX() {
-#ifdef RK_MESSAGE_BOX
-    MessageBox(nullptr, reinterpret_cast<LPCSTR>("JPX"), reinterpret_cast<LPCSTR>("Hello!"), MB_ICONERROR);
-#endif
-
     set_PR_latch();
     SET_STATE(IS_LOW(_pin_K4), _pin_A0);
     SET_STATE(IS_LOW(_pin_K5), _pin_A1);
@@ -426,10 +358,6 @@ VOID I3000_589IK01_Model::RUN_JPX() {
     }
 }
 VOID I3000_589IK01_Model::RUN_JRL() {
-#ifdef RK_MESSAGE_BOX
-    MessageBox(nullptr, reinterpret_cast<LPCSTR>("JRL"), reinterpret_cast<LPCSTR>("Hello!"), MB_ICONERROR);
-#endif
-
     SET_STATE(_PR_latch[0], _pin_A0);
     SET_STATE(_PR_latch[1], _pin_A1);
     SET_STATE(true, _pin_A2);
@@ -441,18 +369,10 @@ VOID I3000_589IK01_Model::RUN_JRL() {
     }
 }
 I3000_589IK01_Model::MicroOperationMnemonic I3000_589IK01_Model::get_micro_operation() const {
-#ifdef RK_MESSAGE_BOX
-    MessageBox(nullptr, reinterpret_cast<LPCSTR>("get_micro_operation"), reinterpret_cast<LPCSTR>("Hello!"),
-               MB_ICONERROR);
-#endif
-
     if (IS_LOW(_pin_AC6) && IS_LOW(_pin_AC5)) {
         return JCC;
     }
     if (IS_LOW(_pin_AC6) && IS_HIGH(_pin_AC5) && IS_LOW(_pin_AC4)) {
-#ifdef RK_MESSAGE_BOX
-        MessageBox(nullptr, reinterpret_cast<LPCSTR>("JZR_op"), reinterpret_cast<LPCSTR>("Hello!"), MB_ICONERROR);
-#endif
         return JZR;
     }
     if (IS_LOW(_pin_AC6) && IS_HIGH(_pin_AC5) && IS_HIGH(_pin_AC4)) {
