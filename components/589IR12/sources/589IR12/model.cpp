@@ -33,7 +33,7 @@ VOID I3000_589IR12_Model::setup(IINSTANCE* instance, IDSIMCKT* dsim) {
     _pin_CS1 = instance->getdsimpin("CS1", true);
     _pin_CS2 = instance->getdsimpin("CS2", true);
     _pin_MD = instance->getdsimpin("MD", true);
-    _pin_EW = instance->getdsimpin("EV", true);
+    _pin_EW = instance->getdsimpin("EW", true);
 
 
     _pin_INR = instance->getdsimpin("INR", true);
