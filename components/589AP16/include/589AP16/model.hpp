@@ -44,7 +44,6 @@ private:
     IDSIMPIN* _pin_DCE;
     IDSIMPIN* _pin_CS;
 
-    static VOID SET_STATE(bool condition, IDSIMPIN2 *pin, ABSTIME time);
 public:
     static constexpr DWORD MODEL_KEY = 0x00000000;
 
