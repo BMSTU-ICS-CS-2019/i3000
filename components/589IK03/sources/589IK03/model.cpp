@@ -72,25 +72,44 @@ BOOL I3000_589IK03_Model::indicate(REALTIME time, ACTIVEDATA* newstate) {
 }
 
 VOID I3000_589IK03_Model::simulate(ABSTIME time, DSIMMODES mode) {
-    BOOL CN = islow(_pin_CN->getstate());
+    BOOL EC8 = ishigh(_pin_EC8->istate());
+    BOOL Y7 = ishigh(_pin_Y7->istate());
+    BOOL X7 = ishigh(_pin_X7->istate());
+    BOOL Y6 = ishigh(_pin_Y6->istate());
+    BOOL X6 = ishigh(_pin_X6->istate());
+    BOOL Y5 = ishigh(_pin_Y5->istate());
+    BOOL X5 = ishigh(_pin_X5->istate());
+    BOOL Y4 = ishigh(_pin_Y4->istate());
+    BOOL X4 = ishigh(_pin_X4->istate());
+    BOOL Y3 = ishigh(_pin_Y3->istate());
+    BOOL X3 = ishigh(_pin_X3->istate());
+    BOOL Y2 = ishigh(_pin_Y2->istate());
+    BOOL X2 = ishigh(_pin_X2->istate());
+    BOOL Y1 = ishigh(_pin_Y1->istate());
+    BOOL X1 = ishigh(_pin_X1->istate());
+    BOOL Y0 = ishigh(_pin_Y0->istate());
+    BOOL X0 = ishigh(_pin_X0->istate());
 
-    BOOL Y7 = ishigh(_pin_Y7->getstate());
-    BOOL X7 = ishigh(_pin_X7->getstate());
-    BOOL Y6 = ishigh(_pin_Y6->getstate());
-    BOOL X6 = ishigh(_pin_X6->getstate());
-    BOOL Y5 = ishigh(_pin_Y5->getstate());
-    BOOL X5 = ishigh(_pin_X5->getstate());
-    BOOL Y4 = ishigh(_pin_Y4->getstate());
-    BOOL X4 = ishigh(_pin_X4->getstate());
-    BOOL Y3 = ishigh(_pin_Y3->getstate());
-    BOOL X3 = ishigh(_pin_X3->getstate());
-    BOOL Y2 = ishigh(_pin_Y2->getstate());
-    BOOL X2 = ishigh(_pin_X2->getstate());
-    BOOL Y1 = ishigh(_pin_Y1->getstate());
-    BOOL X1 = ishigh(_pin_X1->getstate());
-    BOOL Y0 = ishigh(_pin_Y0->getstate());
-    BOOL X0 = ishigh(_pin_X0->getstate());
-    BOOL EC8 = ishigh(_pin_EC8->getstate());
+    BOOL CN = islow(_pin_CN->istate());
+
+
+    _instance->log("EC8: %d", EC8);
+    _instance->log("Y7: %d", Y7);
+    _instance->log("X7: %d", X7);
+    _instance->log("Y6: %d", Y6);
+    _instance->log("X6: %d", X6);
+    _instance->log("Y5: %d", Y5);
+    _instance->log("X5: %d", X5);
+    _instance->log("Y4: %d", Y4);
+    _instance->log("X4: %d", X4);
+    _instance->log("Y3: %d", Y3);
+    _instance->log("X3: %d", X3);
+    _instance->log("Y2: %d", Y2);
+    _instance->log("X2: %d", X2);
+    _instance->log("Y1: %d", Y1);
+    _instance->log("X1: %d", X1);
+    _instance->log("Y0: %d", Y0);
+    _instance->log("X0: %d", X0);
 
     BOOL CN1 = X0 & Y0 | Y0 & CN;
     BOOL CN2 = X1 & Y1 | Y1 & CN1;
@@ -100,6 +119,15 @@ VOID I3000_589IK03_Model::simulate(ABSTIME time, DSIMMODES mode) {
     BOOL CN6 = X5 & Y5 | Y5 & CN5;
     BOOL CN7 = X6 & Y6 | Y6 & CN6;
     BOOL CN8 = X7 & Y7 | Y7 & CN7;
+
+    _instance->log("CN1: %d", CN1);
+    _instance->log("CN2: %d", CN2);
+    _instance->log("CN3: %d", CN3);
+    _instance->log("CN4: %d", CN4);
+    _instance->log("CN5: %d", CN5);
+    _instance->log("CN6: %d", CN6);
+    _instance->log("CN7: %d", CN7);
+    _instance->log("CN8: %d", CN8);
 
     /// Setting the states to outputs.
     SET_INVERSE_STATE(CN1, _pin_CN1, time);
@@ -122,5 +150,5 @@ VOID I3000_589IK03_Model::callback(ABSTIME time, EVENTID eventid) {}
 
 
 VOID I3000_589IK03_Model::SET_INVERSE_STATE(BOOL condition, IDSIMPIN2* pin, ABSTIME time) {
-    FALSE != condition ? pin->setstate(time, details::DELAY, SLO) : pin->setstate(time, details::DELAY, SHI);
+    (FALSE != condition) ? pin->setstate(time, details::DELAY, SLO) : pin->setstate(time, details::DELAY, SHI);
 }
