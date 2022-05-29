@@ -16,10 +16,6 @@
 
 #include <i3000/prelude.hpp>
 
-namespace details{
-    const RELTIME DELAY = 50'000;
-}
-
 class I3000_589IR12_Model : public IDSIMMODEL {
 private:
     // INSTANCE
