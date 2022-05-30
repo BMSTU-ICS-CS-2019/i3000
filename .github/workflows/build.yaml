@@ -6,7 +6,7 @@ on:
     branches: [ master, development ]
 
 env:
-  BUILD_TYPE: Release
+  BUILD_TYPE: Debug
 
 jobs:
   build:
@@ -22,7 +22,7 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/CMakeLists.txt') }}
 
       - name: Install toolchain
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v1.1.1
         with:
           vs-version: 16
           msbuild-architecture: x86
