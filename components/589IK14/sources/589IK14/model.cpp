@@ -86,7 +86,7 @@ VOID I3000_589IK14_Model::simulate(ABSTIME time, DSIMMODES mode) {
     // these only require ERC, EG signals and current values of RGR
     auto const eg = _pin_EG->isactive();
     // register stores the interruption unconditionally
-    if (islow(_pin_ERC->getstate()) && eg && _rgr_ANY) {
+    if (_pin_ERC->isinactive() && eg && _rgr_ANY) {
         _set_state(_pin_IC0, time, model589IK14::IR_TO_IC_DELAY, (_rgr & 0b001) != 0);
         _set_state(_pin_IC1, time, model589IK14::IR_TO_IC_DELAY, (_rgr & 0b010) != 0);
         _set_state(_pin_IC2, time, model589IK14::IR_TO_IC_DELAY, (_rgr & 0b100) != 0);
@@ -98,7 +98,7 @@ VOID I3000_589IK14_Model::simulate(ABSTIME time, DSIMMODES mode) {
 
     // -- Step 3: perform comparison --
     // This is done with respect to stored GS value which allows 0:0 comparison to result `true`
-    auto const comparison = _rgr > _rgs || _rgs_GS;
+    auto const comparison = _rgr > _rgs || (_rgs_GS && _rgr > _rgs);
     // also update GE which does not need any extra inputs
     _set_state(_pin_GE, time, model589IK14::IR_TO_IC_DELAY /* FIXME? */, eg & !_rgr_ANY & _rgs_GS);
 
@@ -152,5 +152,5 @@ VOID I3000_589IK14_Model::_update_rgr() {
 
 VOID I3000_589IK14_Model::_update_rgs() {
     _rgs = (_pin_P0->isinactive() ? 0 : 1) + (_pin_P1->isinactive() ? 0 : 2) + (_pin_P2->isinactive() ? 0 : 4);
-    _rgs_GS = islow(_pin_GS->getstate());
+    _rgs_GS = _pin_GS->isinactive();
 }
