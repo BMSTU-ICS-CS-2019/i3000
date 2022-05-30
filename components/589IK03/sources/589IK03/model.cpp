@@ -1,0 +1,154 @@
+// Copyright 2022 ICS8-64 and ICS8-65
+//
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
+
+#include <589IK03/model.hpp>
+
+void SET_STATE(bool condition, IDSIMPIN2* pin, ABSTIME time);
+INT I3000_589IK03_Model::isdigital(CHAR* pinname) {
+    return 1;
+}
+
+VOID I3000_589IK03_Model::setup(IINSTANCE* instance, IDSIMCKT* dsimckt) {
+    _instance = instance;
+    _ckt = dsimckt;
+
+    _pin_EC8 = instance->getdsimpin("EC8", true);
+    _pin_Y7 = instance->getdsimpin("Y7", true);
+    _pin_X7 = instance->getdsimpin("X7", true);
+    _pin_Y6 = instance->getdsimpin("Y6", true);
+    _pin_X6 = instance->getdsimpin("X6", true);
+    _pin_Y5 = instance->getdsimpin("Y5", true);
+    _pin_X5 = instance->getdsimpin("X5", true);
+    _pin_Y4 = instance->getdsimpin("Y4", true);
+    _pin_X4 = instance->getdsimpin("X4", true);
+    _pin_Y3 = instance->getdsimpin("Y3", true);
+    _pin_X3 = instance->getdsimpin("X3", true);
+    _pin_Y2 = instance->getdsimpin("Y2", true);
+    _pin_X2 = instance->getdsimpin("X2", true);
+    _pin_Y1 = instance->getdsimpin("Y1", true);
+    _pin_X1 = instance->getdsimpin("X1", true);
+    _pin_Y0 = instance->getdsimpin("Y0", true);
+    _pin_X0 = instance->getdsimpin("X0", true);
+    _pin_CN = instance->getdsimpin("Cn", true);
+
+    _pin_CN8 = instance->getdsimpin("Cn+8", true);
+    _pin_CN7 = instance->getdsimpin("Cn+7", true);
+    _pin_CN6 = instance->getdsimpin("Cn+6", true);
+    _pin_CN5 = instance->getdsimpin("Cn+5", true);
+    _pin_CN4 = instance->getdsimpin("Cn+4", true);
+    _pin_CN3 = instance->getdsimpin("Cn+3", true);
+    _pin_CN2 = instance->getdsimpin("Cn+2", true);
+    _pin_CN1 = instance->getdsimpin("Cn+1", true);
+
+    // SET 'SLO' STATE TO OUTPUT PINS
+    _pin_CN8->setstate(SLO);
+    _pin_CN7->setstate(SLO);
+    _pin_CN6->setstate(SLO);
+    _pin_CN5->setstate(SLO);
+    _pin_CN4->setstate(SLO);
+    _pin_CN3->setstate(SLO);
+    _pin_CN2->setstate(SLO);
+    _pin_CN1->setstate(SLO);
+}
+
+
+VOID I3000_589IK03_Model::runctrl(RUNMODES mode) {}
+
+VOID I3000_589IK03_Model::actuate(REALTIME time, ACTIVESTATE newstate) {}
+
+BOOL I3000_589IK03_Model::indicate(REALTIME time, ACTIVEDATA* newstate) {
+    return FALSE;
+}
+
+VOID I3000_589IK03_Model::simulate(ABSTIME time, DSIMMODES mode) {
+    BOOL EC8 = ishigh(_pin_EC8->istate());
+    BOOL Y7 = ishigh(_pin_Y7->istate());
+    BOOL X7 = ishigh(_pin_X7->istate());
+    BOOL Y6 = ishigh(_pin_Y6->istate());
+    BOOL X6 = ishigh(_pin_X6->istate());
+    BOOL Y5 = ishigh(_pin_Y5->istate());
+    BOOL X5 = ishigh(_pin_X5->istate());
+    BOOL Y4 = ishigh(_pin_Y4->istate());
+    BOOL X4 = ishigh(_pin_X4->istate());
+    BOOL Y3 = ishigh(_pin_Y3->istate());
+    BOOL X3 = ishigh(_pin_X3->istate());
+    BOOL Y2 = ishigh(_pin_Y2->istate());
+    BOOL X2 = ishigh(_pin_X2->istate());
+    BOOL Y1 = ishigh(_pin_Y1->istate());
+    BOOL X1 = ishigh(_pin_X1->istate());
+    BOOL Y0 = ishigh(_pin_Y0->istate());
+    BOOL X0 = ishigh(_pin_X0->istate());
+
+    BOOL CN = islow(_pin_CN->istate());
+
+
+    _instance->log("EC8: %d", EC8);
+    _instance->log("Y7: %d", Y7);
+    _instance->log("X7: %d", X7);
+    _instance->log("Y6: %d", Y6);
+    _instance->log("X6: %d", X6);
+    _instance->log("Y5: %d", Y5);
+    _instance->log("X5: %d", X5);
+    _instance->log("Y4: %d", Y4);
+    _instance->log("X4: %d", X4);
+    _instance->log("Y3: %d", Y3);
+    _instance->log("X3: %d", X3);
+    _instance->log("Y2: %d", Y2);
+    _instance->log("X2: %d", X2);
+    _instance->log("Y1: %d", Y1);
+    _instance->log("X1: %d", X1);
+    _instance->log("Y0: %d", Y0);
+    _instance->log("X0: %d", X0);
+
+    BOOL CN1 = X0 & Y0 | Y0 & CN;
+    BOOL CN2 = X1 & Y1 | Y1 & CN1;
+    BOOL CN3 = X2 & Y2 | Y2 & CN2;
+    BOOL CN4 = X3 & Y3 | Y3 & CN3;
+    BOOL CN5 = X4 & Y4 | Y4 & CN4;
+    BOOL CN6 = X5 & Y5 | Y5 & CN5;
+    BOOL CN7 = X6 & Y6 | Y6 & CN6;
+    BOOL CN8 = X7 & Y7 | Y7 & CN7;
+
+    _instance->log("CN1: %d", CN1);
+    _instance->log("CN2: %d", CN2);
+    _instance->log("CN3: %d", CN3);
+    _instance->log("CN4: %d", CN4);
+    _instance->log("CN5: %d", CN5);
+    _instance->log("CN6: %d", CN6);
+    _instance->log("CN7: %d", CN7);
+    _instance->log("CN8: %d", CN8);
+
+    /// Setting the states to outputs.
+    SET_INVERSE_STATE(CN1, _pin_CN1, time);
+    SET_INVERSE_STATE(CN2, _pin_CN2, time);
+    SET_INVERSE_STATE(CN3, _pin_CN3, time);
+    SET_INVERSE_STATE(CN4, _pin_CN4, time);
+    SET_INVERSE_STATE(CN5, _pin_CN5, time);
+    SET_INVERSE_STATE(CN6, _pin_CN6, time);
+    SET_INVERSE_STATE(CN7, _pin_CN7, time);
+
+    if (FALSE == EC8) {
+        // to FALSE actually =)
+        SET_INVERSE_STATE(TRUE, _pin_CN8, time);
+    } else {
+        SET_INVERSE_STATE(CN8, _pin_CN8, time);
+    }
+}
+
+VOID I3000_589IK03_Model::callback(ABSTIME time, EVENTID eventid) {}
+
+
+VOID I3000_589IK03_Model::SET_INVERSE_STATE(BOOL condition, IDSIMPIN2* pin, ABSTIME time) {
+    (FALSE != condition) ? pin->setstate(time, details::DELAY, SLO) : pin->setstate(time, details::DELAY, SHI);
+}
