@@ -62,7 +62,7 @@ namespace k589 {
         BOOL _block_trigger_inverted = true;
 
     public:
-        static constexpr DWORD MODEL_KEY = 0x00000000;
+        static constexpr DWORD MODEL_KEY = 0x00011111;
         static constexpr auto MODEL_NAME = "K589IK14";
 
         INT isdigital(CHAR* pinname) override;
