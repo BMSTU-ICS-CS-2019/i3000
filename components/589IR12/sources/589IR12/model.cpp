@@ -83,8 +83,6 @@ VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
         _instance->log("MBR: Reset");
         return;
     }
-    /// Сигнал стробирования
-    if (!_pin_EW->isposedge()) return;
 
     BOOL selected = _pin_CS1->isinactive() && _pin_CS2->isactive();
 
@@ -101,24 +99,56 @@ VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
      * При наличии лог. 1 на входе MD устройство работает в режиме вывода.
      * В этом случае выходные буферные каскады открыты независимо от выборки устройства.
      */
-    if (_pin_MD->isactive()) return;
 
-    /// MD=0 (режим ввода)
-    /// При наличии лог. 0 иа входе CS1 н лог. 1 иа входе CS2 устройство выбрано.
-    if (selected) {
-        SET_STATE(_pin_D1->isactive(), _pin_Q1, time);
-        SET_STATE(_pin_D2->isactive(), _pin_Q2, time);
-        SET_STATE(_pin_D3->isactive(), _pin_Q3, time);
-        SET_STATE(_pin_D4->isactive(), _pin_Q4, time);
-        SET_STATE(_pin_D5->isactive(), _pin_Q5, time);
-        SET_STATE(_pin_D6->isactive(), _pin_Q6, time);
-        SET_STATE(_pin_D7->isactive(), _pin_Q7, time);
-        SET_STATE(_pin_D8->isactive(), _pin_Q8, time);
+    if (selected && _pin_MD->isinactive()) {
+        if (_pin_EW->isposedge()) {
+            // read
+            data[0] = _pin_D1->isactive();
+            data[1] = _pin_D2->isactive();
+            data[2] = _pin_D3->isactive();
+            data[3] = _pin_D4->isactive();
+            data[4] = _pin_D5->isactive();
+            data[5] = _pin_D6->isactive();
+            data[6] = _pin_D7->isactive();
+            data[7] = _pin_D8->isactive();
 
-        ///При работе в режиме ввода входной сигнал EW производит запись информации в регистр данных
-        /// и установку триггера запроса в 0.
-        SET_STATE(false, _pin_INR, time);
-        _instance->log("MBR: Data read");
+            ///При работе в режиме ввода входной сигнал EW производит запись информации в регистр данных
+            /// и установку триггера запроса в 0.
+
+            SET_STATE(false, _pin_INR, time);
+            _instance->log("MBR: Data read");
+        }
+        SET_STATE(data[0], _pin_Q1, time);
+        SET_STATE(data[1], _pin_Q2, time);
+        SET_STATE(data[2], _pin_Q3, time);
+        SET_STATE(data[3], _pin_Q4, time);
+        SET_STATE(data[4], _pin_Q5, time);
+        SET_STATE(data[5], _pin_Q6, time);
+        SET_STATE(data[6], _pin_Q7, time);
+        SET_STATE(data[7], _pin_Q8, time);
+    }
+
+    if (_pin_MD->isactive()) {
+        SET_STATE(data[0], _pin_Q1, time);
+        SET_STATE(data[1], _pin_Q2, time);
+        SET_STATE(data[2], _pin_Q3, time);
+        SET_STATE(data[3], _pin_Q4, time);
+        SET_STATE(data[4], _pin_Q5, time);
+        SET_STATE(data[5], _pin_Q6, time);
+        SET_STATE(data[6], _pin_Q7, time);
+        SET_STATE(data[7], _pin_Q8, time);
+    }
+
+    // Если не выбрано, на выходе нули, независимо от того что хранится
+    if (!selected) {
+        SET_STATE(false, _pin_Q1, time);
+        SET_STATE(false, _pin_Q2, time);
+        SET_STATE(false, _pin_Q3, time);
+        SET_STATE(false, _pin_Q4, time);
+        SET_STATE(false, _pin_Q5, time);
+        SET_STATE(false, _pin_Q6, time);
+        SET_STATE(false, _pin_Q7, time);
+        SET_STATE(false, _pin_Q8, time);
     }
 }
 VOID I3000_589IR12_Model::SET_STATE(bool condition, IDSIMPIN2* pin, ABSTIME time) {
