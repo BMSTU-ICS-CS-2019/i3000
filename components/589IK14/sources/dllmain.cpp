@@ -14,7 +14,7 @@
 
 #include <i3000/prelude.hpp>
 
-#include <589IK14/model.hpp>
+#include <k589ik14.hpp>
 
 extern "C" {
     IDSIMMODEL __declspec(dllexport) * createdsimmodel(CHAR* device, ILICENCESERVER* license_server) {

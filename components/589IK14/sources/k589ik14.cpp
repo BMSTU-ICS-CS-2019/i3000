@@ -12,7 +12,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-#include <589IK14/model.hpp>
+#include "k589ik14.hpp"
 
 namespace k589 {
     constexpr RELTIME IR_TO_IC_DELAY = 100'000;
