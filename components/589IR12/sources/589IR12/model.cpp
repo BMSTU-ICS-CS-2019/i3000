@@ -67,7 +67,7 @@ BOOL I3000_589IR12_Model::indicate(REALTIME time, ACTIVEDATA* newstate) {
 
 VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
     /// Асинхронное обнуление
-    if (islow(_pin_CLR->getstate())) {
+    if (_pin_CLR->isinactive()) {
         _pin_Q1->setstate(SLO);
         _pin_Q2->setstate(SLO);
         _pin_Q3->setstate(SLO);
@@ -82,9 +82,9 @@ VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
         return;
     }
     /// Сигнал стробирования
-    if (islow(_pin_EW->getstate())) return;
+    if (_pin_EW->isinactive()) return;
 
-    BOOL selected = islow(_pin_CS1->getstate()) && ishigh(_pin_CS2->getstate());
+    BOOL selected = _pin_CS1->isinactive() && _pin_CS2->isactive();
 
     /// Триггер запроса прерывания устанавливается в 1 при условии выбора устройства
     if (selected) {
@@ -99,7 +99,7 @@ VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
      * При наличии лог. 1 на входе MD устройство работает в режиме вывода.
      * В этом случае выходные буферные каскады открыты независимо от выборки устройства.
      */
-    if (ishigh(_pin_MD->getstate())) return;
+    if (_pin_MD->isactive()) return;
 
     /// MD=0 (режим ввода)
     /// При наличии лог. 0 иа входе CS1 н лог. 1 иа входе CS2 устройство выбрано.
