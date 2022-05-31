@@ -35,7 +35,6 @@ VOID I3000_589IR12_Model::setup(IINSTANCE* instance, IDSIMCKT* dsim) {
     _pin_MD = instance->getdsimpin("MD", true);
     _pin_EW = instance->getdsimpin("EW", true);
 
-
     _pin_INR = instance->getdsimpin("INR", true);
     _pin_Q1 = instance->getdsimpin("Q1", true);
     _pin_Q2 = instance->getdsimpin("Q2", true);
@@ -55,6 +54,8 @@ VOID I3000_589IR12_Model::setup(IINSTANCE* instance, IDSIMCKT* dsim) {
     _pin_Q6->setstate(SLO);
     _pin_Q7->setstate(SLO);
     _pin_Q8->setstate(SLO);
+
+    _instance->log("MBR: Set up");
 }
 
 VOID I3000_589IR12_Model::runctrl(RUNMODES mode) {}
@@ -67,28 +68,36 @@ BOOL I3000_589IR12_Model::indicate(REALTIME time, ACTIVEDATA* newstate) {
 
 VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
     /// Асинхронное обнуление
-    if (islow(_pin_CLR->getstate())) {
-        _pin_Q1->setstate(SLO);
-        _pin_Q2->setstate(SLO);
-        _pin_Q3->setstate(SLO);
-        _pin_Q4->setstate(SLO);
-        _pin_Q5->setstate(SLO);
-        _pin_Q6->setstate(SLO);
-        _pin_Q7->setstate(SLO);
-        _pin_Q8->setstate(SLO);
+    if (_pin_CLR->isinactive()) {
+        data[0] = false;
+        data[1] = false;
+        data[2] = false;
+        data[3] = false;
+        data[4] = false;
+        data[5] = false;
+        data[6] = false;
+        data[7] = false;
+
+        SET_STATE(false, _pin_Q1, time);
+        SET_STATE(false, _pin_Q2, time);
+        SET_STATE(false, _pin_Q3, time);
+        SET_STATE(false, _pin_Q4, time);
+        SET_STATE(false, _pin_Q5, time);
+        SET_STATE(false, _pin_Q6, time);
+        SET_STATE(false, _pin_Q7, time);
+        SET_STATE(false, _pin_Q8, time);
         /// При установке системы в исходное состояние инзким уровнем сигнала CLR
         /// триггер запроса прерывания устанавливается в 1
-        _pin_INR->setstate(SHI);
+        SET_STATE(true, _pin_INR, time);
+        _instance->log("MBR: Reset");
         return;
     }
-    /// Сигнал стробирования
-    if (islow(_pin_EW->getstate())) return;
 
-    BOOL selected = islow(_pin_CS1->getstate()) && ishigh(_pin_CS2->getstate());
+    BOOL selected = _pin_CS1->isinactive() && _pin_CS2->isactive();
 
     /// Триггер запроса прерывания устанавливается в 1 при условии выбора устройства
-    if (selected) {
-        _pin_INR->setstate(SHI);
+    if (selected && (_pin_CS1->isnegedge() || _pin_CS2->isposedge())) {
+        SET_STATE(true, _pin_INR, time);
     }
 
     /** Режимы работы
@@ -99,24 +108,60 @@ VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
      * При наличии лог. 1 на входе MD устройство работает в режиме вывода.
      * В этом случае выходные буферные каскады открыты независимо от выборки устройства.
      */
-    if (ishigh(_pin_MD->getstate())) return;
 
-    /// MD=0 (режим ввода)
-    /// При наличии лог. 0 иа входе CS1 н лог. 1 иа входе CS2 устройство выбрано.
-    if (selected) {
-        _pin_Q1->setstate(_pin_D1->getstate());
-        _pin_Q2->setstate(_pin_D2->getstate());
-        _pin_Q3->setstate(_pin_D3->getstate());
-        _pin_Q4->setstate(_pin_D4->getstate());
-        _pin_Q5->setstate(_pin_D5->getstate());
-        _pin_Q6->setstate(_pin_D6->getstate());
-        _pin_Q7->setstate(_pin_D7->getstate());
-        _pin_Q8->setstate(_pin_D8->getstate());
+    if (selected && _pin_MD->isinactive()) {
+        if (_pin_EW->isposedge()) {
+            // read
+            data[0] = _pin_D1->isactive();
+            data[1] = _pin_D2->isactive();
+            data[2] = _pin_D3->isactive();
+            data[3] = _pin_D4->isactive();
+            data[4] = _pin_D5->isactive();
+            data[5] = _pin_D6->isactive();
+            data[6] = _pin_D7->isactive();
+            data[7] = _pin_D8->isactive();
 
-        ///При работе в режиме ввода входной сигнал EW производит запись информации в регистр данных
-        /// и установку триггера запроса в 0.
-        _pin_INR->setstate(SLO);
+            ///При работе в режиме ввода входной сигнал EW производит запись информации в регистр данных
+            /// и установку триггера запроса в 0.
+
+            SET_STATE(false, _pin_INR, time);
+            _instance->log("MBR: Data read");
+        }
+        SET_STATE(data[0], _pin_Q1, time);
+        SET_STATE(data[1], _pin_Q2, time);
+        SET_STATE(data[2], _pin_Q3, time);
+        SET_STATE(data[3], _pin_Q4, time);
+        SET_STATE(data[4], _pin_Q5, time);
+        SET_STATE(data[5], _pin_Q6, time);
+        SET_STATE(data[6], _pin_Q7, time);
+        SET_STATE(data[7], _pin_Q8, time);
     }
+
+    if (_pin_MD->isactive()) {
+        SET_STATE(data[0], _pin_Q1, time);
+        SET_STATE(data[1], _pin_Q2, time);
+        SET_STATE(data[2], _pin_Q3, time);
+        SET_STATE(data[3], _pin_Q4, time);
+        SET_STATE(data[4], _pin_Q5, time);
+        SET_STATE(data[5], _pin_Q6, time);
+        SET_STATE(data[6], _pin_Q7, time);
+        SET_STATE(data[7], _pin_Q8, time);
+    }
+
+    // Если не выбрано, на выходе нули, независимо от того что хранится
+    if (!selected) {
+        SET_STATE(false, _pin_Q1, time);
+        SET_STATE(false, _pin_Q2, time);
+        SET_STATE(false, _pin_Q3, time);
+        SET_STATE(false, _pin_Q4, time);
+        SET_STATE(false, _pin_Q5, time);
+        SET_STATE(false, _pin_Q6, time);
+        SET_STATE(false, _pin_Q7, time);
+        SET_STATE(false, _pin_Q8, time);
+    }
+}
+VOID I3000_589IR12_Model::SET_STATE(bool condition, IDSIMPIN2* pin, ABSTIME time) {
+    pin->setstate(time, details::DELAY, condition ? SHI : SLO);
 }
 
 VOID I3000_589IR12_Model::callback(ABSTIME time, EVENTID eventid) {}

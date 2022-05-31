@@ -51,6 +51,11 @@ private:
     IDSIMPIN* _pin_Q7;
     IDSIMPIN* _pin_Q8;
 
+    // data
+    BOOL data[8];
+
+    VOID SET_STATE(bool condition, IDSIMPIN2* pin, ABSTIME time);
+
 public:
     static constexpr DWORD MODEL_KEY = 0x00000000;
 
