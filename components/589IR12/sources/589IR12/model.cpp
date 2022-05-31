@@ -69,6 +69,15 @@ BOOL I3000_589IR12_Model::indicate(REALTIME time, ACTIVEDATA* newstate) {
 VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
     /// Асинхронное обнуление
     if (_pin_CLR->isinactive()) {
+        data[0] = false;
+        data[1] = false;
+        data[2] = false;
+        data[3] = false;
+        data[4] = false;
+        data[5] = false;
+        data[6] = false;
+        data[7] = false;
+
         SET_STATE(false, _pin_Q1, time);
         SET_STATE(false, _pin_Q2, time);
         SET_STATE(false, _pin_Q3, time);
@@ -87,7 +96,7 @@ VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
     BOOL selected = _pin_CS1->isinactive() && _pin_CS2->isactive();
 
     /// Триггер запроса прерывания устанавливается в 1 при условии выбора устройства
-    if (selected) {
+    if (selected && (_pin_CS1->isnegedge() || _pin_CS2->isposedge())) {
         SET_STATE(true, _pin_INR, time);
     }
 
