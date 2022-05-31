@@ -18,14 +18,15 @@
 
 extern "C" {
     IDSIMMODEL __declspec(dllexport) * createdsimmodel(CHAR* device, ILICENCESERVER* license_server) {
-        return license_server->authorize(I3000_589IK14_Model::MODEL_KEY) ? new I3000_589IK14_Model() : nullptr;
+        return license_server->authorize(k589::Ik14Model::MODEL_KEY) ? new k589::Ik14Model() : nullptr;
     }
 
     VOID __declspec(dllexport) deletedsimmodel(IDSIMMODEL* model) {
-        delete (I3000_589IK14_Model*) model;
+        delete dynamic_cast<k589::Ik14Model*>(model);
     }
 }
 
-BOOL WINAPI DllMain(HMODULE hmodule, DWORD call_reason, [[maybe_unused]] LPVOID _reserved) {
+BOOL WINAPI DllMain([[maybe_unused]] HMODULE hmodule, [[maybe_unused]] DWORD call_reason,
+                    [[maybe_unused]] LPVOID _reserved) {
     return TRUE;
 }

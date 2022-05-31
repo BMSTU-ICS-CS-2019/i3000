@@ -16,66 +16,72 @@
 
 #include <i3000/prelude.hpp>
 
-class I3000_589IK14_Model : public IDSIMMODEL {
-private:
-    // INPUT PINS
-    IDSIMPIN* _pin_INE;
-    IDSIMPIN* _pin_CLK;
-    IDSIMPIN* _pin_P2;
-    IDSIMPIN* _pin_P1;
-    IDSIMPIN* _pin_P0;
-    IDSIMPIN* _pin_GS;
-    IDSIMPIN* _pin_EW;
-    IDSIMPIN* _pin_ERC;
-    IDSIMPIN* _pin_EG;
-    IDSIMPIN* _pin_IR7;
-    IDSIMPIN* _pin_IR6;
-    IDSIMPIN* _pin_IR5;
-    IDSIMPIN* _pin_IR4;
-    IDSIMPIN* _pin_IR3;
-    IDSIMPIN* _pin_IR2;
-    IDSIMPIN* _pin_IR1;
-    IDSIMPIN* _pin_IR0;
+namespace k589 {
 
-    // OUTPUT PINS
-    IDSIMPIN* _pin_IC2;
-    IDSIMPIN* _pin_IC1;
-    IDSIMPIN* _pin_IC0;
-    IDSIMPIN* _pin_GE;
-    IDSIMPIN* _pin_IA;
+    class Ik14Model : public IDSIMMODEL {
+    private:
+        IINSTANCE* _instance = nullptr;
 
-    // registers
+        // INPUT PINS
+        IDSIMPIN* _pin_INE = nullptr;
+        IDSIMPIN* _pin_CLK = nullptr;
+        IDSIMPIN* _pin_P2 = nullptr;
+        IDSIMPIN* _pin_P1 = nullptr;
+        IDSIMPIN* _pin_P0 = nullptr;
+        IDSIMPIN* _pin_GS = nullptr;
+        IDSIMPIN* _pin_EW = nullptr;
+        IDSIMPIN* _pin_ERC = nullptr;
+        IDSIMPIN* _pin_EG = nullptr;
+        IDSIMPIN* _pin_IR7 = nullptr;
+        IDSIMPIN* _pin_IR6 = nullptr;
+        IDSIMPIN* _pin_IR5 = nullptr;
+        IDSIMPIN* _pin_IR4 = nullptr;
+        IDSIMPIN* _pin_IR3 = nullptr;
+        IDSIMPIN* _pin_IR2 = nullptr;
+        IDSIMPIN* _pin_IR1 = nullptr;
+        IDSIMPIN* _pin_IR0 = nullptr;
 
-    // requested interruption
-    BYTE _rgr = 0;
-    BOOL _rgr_ANY = false;
+        // OUTPUT PINS
+        IDSIMPIN* _pin_IC2 = nullptr;
+        IDSIMPIN* _pin_IC1 = nullptr;
+        IDSIMPIN* _pin_IC0 = nullptr;
+        IDSIMPIN* _pin_GE = nullptr;
+        IDSIMPIN* _pin_IA = nullptr;
 
-    // priority
-    BYTE _rgs = 0;
-    BOOL _rgs_GS = false;
+        // registers
 
-    // synthetic trigger
-    BOOL _block_trigger_inverted = true;
+        // requested interruption
+        BYTE _rgr = 0;
+        BOOL _rgr_ANY = false;
 
-public:
-    static constexpr DWORD MODEL_KEY = 0x00000000;
+        // priority
+        BYTE _rgs = 0;
+        BOOL _rgs_GS = false;
 
-    INT isdigital(CHAR* pinname) override;
+        // synthetic trigger
+        BOOL _block_trigger_inverted = true;
 
-    VOID setup(IINSTANCE* instance, IDSIMCKT* dsim) override;
+    public:
+        static constexpr DWORD MODEL_KEY = 0x00000000;
+        static constexpr auto MODEL_NAME = "K589IK14";
 
-    VOID runctrl(RUNMODES mode) override;
+        INT isdigital(CHAR* pinname) override;
 
-    VOID actuate(REALTIME time, ACTIVESTATE newstate) override;
+        VOID setup(IINSTANCE* instance, IDSIMCKT* dsim) override;
 
-    BOOL indicate(REALTIME time, ACTIVEDATA* newstate) override;
+        VOID runctrl(RUNMODES mode) override;
 
-    VOID simulate(ABSTIME time, DSIMMODES mode) override;
+        VOID actuate(REALTIME time, ACTIVESTATE newstate) override;
 
-    VOID callback(ABSTIME time, EVENTID eventid) override;
+        BOOL indicate(REALTIME time, ACTIVEDATA* newstate) override;
 
-private:
-    VOID _update_rgr();
+        VOID simulate(ABSTIME time, DSIMMODES mode) override;
 
-    VOID _update_rgs();
-};
+        VOID callback(ABSTIME time, EVENTID eventid) override;
+
+    private:
+        VOID _update_rgr();
+
+        VOID _update_rgs();
+    };
+} // namespace k589
