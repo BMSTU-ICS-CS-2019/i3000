@@ -14,20 +14,15 @@
 
 #include <i3000/prelude.hpp>
 
-#include <589IK01/model.hpp>
-#include <iostream>
+#include <589IK03/model.hpp>
 
 extern "C" {
     IDSIMMODEL __declspec(dllexport) * createdsimmodel(CHAR* device, ILICENCESERVER* license_server) {
-//        MessageBox(nullptr, reinterpret_cast<LPCSTR>("Compile Time " __DATE__ " " __TIME__),
-//                   reinterpret_cast<LPCSTR>("Hello!"),
-//                   MB_ICONERROR);
-//        std::cout<<__DATE__<<std::endl;
-        return license_server->authorize(I3000_589IK01_Model::MODEL_KEY) ? new I3000_589IK01_Model() : nullptr;
+        return license_server->authorize(I3000_589IK03_Model::MODEL_KEY) ? new I3000_589IK03_Model() : nullptr;
     }
 
     VOID __declspec(dllexport) deletedsimmodel(IDSIMMODEL* model) {
-        delete (I3000_589IK01_Model*) model;
+        delete (I3000_589IK03_Model*) model;
     }
 }
 
