@@ -69,17 +69,17 @@ BOOL I3000_589IR12_Model::indicate(REALTIME time, ACTIVEDATA* newstate) {
 VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
     /// Асинхронное обнуление
     if (_pin_CLR->isinactive()) {
-        _pin_Q1->setstate(SLO);
-        _pin_Q2->setstate(SLO);
-        _pin_Q3->setstate(SLO);
-        _pin_Q4->setstate(SLO);
-        _pin_Q5->setstate(SLO);
-        _pin_Q6->setstate(SLO);
-        _pin_Q7->setstate(SLO);
-        _pin_Q8->setstate(SLO);
+        SET_STATE(false, _pin_Q1, time);
+        SET_STATE(false, _pin_Q2, time);
+        SET_STATE(false, _pin_Q3, time);
+        SET_STATE(false, _pin_Q4, time);
+        SET_STATE(false, _pin_Q5, time);
+        SET_STATE(false, _pin_Q6, time);
+        SET_STATE(false, _pin_Q7, time);
+        SET_STATE(false, _pin_Q8, time);
         /// При установке системы в исходное состояние инзким уровнем сигнала CLR
         /// триггер запроса прерывания устанавливается в 1
-        _pin_INR->setstate(SHI);
+        SET_STATE(true, _pin_INR, time);
         _instance->log("MBR: Reset");
         return;
     }
@@ -90,7 +90,7 @@ VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
 
     /// Триггер запроса прерывания устанавливается в 1 при условии выбора устройства
     if (selected) {
-        _pin_INR->setstate(SHI);
+        SET_STATE(true, _pin_INR, time);
     }
 
     /** Режимы работы
@@ -106,20 +106,23 @@ VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
     /// MD=0 (режим ввода)
     /// При наличии лог. 0 иа входе CS1 н лог. 1 иа входе CS2 устройство выбрано.
     if (selected) {
-        _pin_Q1->setstate(_pin_D1->getstate());
-        _pin_Q2->setstate(_pin_D2->getstate());
-        _pin_Q3->setstate(_pin_D3->getstate());
-        _pin_Q4->setstate(_pin_D4->getstate());
-        _pin_Q5->setstate(_pin_D5->getstate());
-        _pin_Q6->setstate(_pin_D6->getstate());
-        _pin_Q7->setstate(_pin_D7->getstate());
-        _pin_Q8->setstate(_pin_D8->getstate());
+        SET_STATE(_pin_D1->isactive(), _pin_Q1, time);
+        SET_STATE(_pin_D2->isactive(), _pin_Q2, time);
+        SET_STATE(_pin_D3->isactive(), _pin_Q3, time);
+        SET_STATE(_pin_D4->isactive(), _pin_Q4, time);
+        SET_STATE(_pin_D5->isactive(), _pin_Q5, time);
+        SET_STATE(_pin_D6->isactive(), _pin_Q6, time);
+        SET_STATE(_pin_D7->isactive(), _pin_Q7, time);
+        SET_STATE(_pin_D8->isactive(), _pin_Q8, time);
 
         ///При работе в режиме ввода входной сигнал EW производит запись информации в регистр данных
         /// и установку триггера запроса в 0.
-        _pin_INR->setstate(SLO);
+        SET_STATE(false, _pin_INR, time);
         _instance->log("MBR: Data read");
     }
+}
+VOID I3000_589IR12_Model::SET_STATE(bool condition, IDSIMPIN2* pin, ABSTIME time) {
+    pin->setstate(time, details::DELAY, condition ? SHI : SLO);
 }
 
 VOID I3000_589IR12_Model::callback(ABSTIME time, EVENTID eventid) {}
