@@ -35,7 +35,6 @@ VOID I3000_589IR12_Model::setup(IINSTANCE* instance, IDSIMCKT* dsim) {
     _pin_MD = instance->getdsimpin("MD", true);
     _pin_EW = instance->getdsimpin("EW", true);
 
-
     _pin_INR = instance->getdsimpin("INR", true);
     _pin_Q1 = instance->getdsimpin("Q1", true);
     _pin_Q2 = instance->getdsimpin("Q2", true);
@@ -55,6 +54,8 @@ VOID I3000_589IR12_Model::setup(IINSTANCE* instance, IDSIMCKT* dsim) {
     _pin_Q6->setstate(SLO);
     _pin_Q7->setstate(SLO);
     _pin_Q8->setstate(SLO);
+
+    _instance->log("MBR: Set up");
 }
 
 VOID I3000_589IR12_Model::runctrl(RUNMODES mode) {}
@@ -79,10 +80,11 @@ VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
         /// При установке системы в исходное состояние инзким уровнем сигнала CLR
         /// триггер запроса прерывания устанавливается в 1
         _pin_INR->setstate(SHI);
+        _instance->log("MBR: Reset");
         return;
     }
     /// Сигнал стробирования
-    if (_pin_EW->isinactive()) return;
+    if (!_pin_EW->isposedge()) return;
 
     BOOL selected = _pin_CS1->isinactive() && _pin_CS2->isactive();
 
@@ -116,6 +118,7 @@ VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
         ///При работе в режиме ввода входной сигнал EW производит запись информации в регистр данных
         /// и установку триггера запроса в 0.
         _pin_INR->setstate(SLO);
+        _instance->log("MBR: Data read");
     }
 }
 
