@@ -82,18 +82,21 @@ private:
         JCE,
         JPX,
         JRL,
+        NOP,
     };
     enum FlagInputMnemonic {
         SCZ,
         STZ,
         STC,
         HCZ,
+        NFI, // No Flag Input
     };
     enum FlagOutputMnemonic{
         FF0,
         FFC,
         FFZ,
-        FF1
+        FF1,
+        NFO, // No Flag Output
     };
 
     MicroOperationMnemonic get_micro_operation() const;
@@ -113,9 +116,13 @@ private:
     BOOL _F = false;
     BOOL _C = false;
     BOOL _Z = false;
-
     BOOL _PR_latch[4];
     BOOL _A_values[9];
+    MicroOperationMnemonic _micro_operation_mnemonic = NOP;
+    FlagInputMnemonic _flag_input_mnemonic = NFI;
+    FlagOutputMnemonic _flag_output_mnemonic = NFO;
+
+
     void set_flags();
     void output_flags();
     void set_PR_latch();

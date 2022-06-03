@@ -94,6 +94,9 @@ BOOL I3000_589IK01_Model::indicate(REALTIME time, ACTIVEDATA* newstate) {
 VOID I3000_589IK01_Model::simulate(ABSTIME time, DSIMMODES mode) {
     if (_pin_CLK->isposedge()) {
         // Фронт
+        _micro_operation_mnemonic = get_micro_operation();
+        _flag_input_mnemonic = get_flag_input_mnemonic();
+        _flag_output_mnemonic = get_flag_output_mnemonic();
         output_flags();
     } else if (_pin_CLK->isnegedge()) {
         if (IS_HIGH(_pin_EWA)) {
@@ -125,8 +128,7 @@ BOOL I3000_589IK01_Model::IS_LOW(IDSIMPIN* pin) {
     return 1 - IS_HIGH(pin);
 }
 void I3000_589IK01_Model::set_flags() {
-    auto flag_mnemonic = get_flag_input_mnemonic();
-    switch (flag_mnemonic) {
+    switch (_flag_input_mnemonic) {
         case SCZ:
             _C = _F;
             _Z = _F;
@@ -143,8 +145,7 @@ void I3000_589IK01_Model::set_flags() {
 }
 
 void I3000_589IK01_Model::output_flags() {
-    auto flag_mnemonic = get_flag_output_mnemonic();
-    switch (flag_mnemonic) {
+    switch (_flag_output_mnemonic) {
         case FF0:
             SET_STATE(true, _pin_FO);
             break;
@@ -160,8 +161,7 @@ void I3000_589IK01_Model::output_flags() {
     }
 }
 void I3000_589IK01_Model::output_logic_A() {
-    auto state = get_micro_operation();
-    switch (state) {
+    switch (_micro_operation_mnemonic) {
         case JCC:
             RUN_JCC();
             break;
