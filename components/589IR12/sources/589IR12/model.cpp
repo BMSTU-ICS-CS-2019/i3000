@@ -150,13 +150,13 @@ VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
 
     // Если не выбрано, на выходе нули, независимо от того что хранится
     if (!selected) {
-        SET_STATE(WLO, _pin_Q1, time);
-        SET_STATE(FLT, _pin_Q2, time);
-        SET_STATE(WHI, _pin_Q3, time);
-        SET_STATE(SHI, _pin_Q4, time);
-        SET_STATE(IHI, _pin_Q5, time);
-        SET_STATE(PHI, _pin_Q6, time);
-        SET_STATE(WUD, _pin_Q7, time);
+        SET_STATE(SUD, _pin_Q1, time);
+        SET_STATE(SUD, _pin_Q2, time);
+        SET_STATE(SUD, _pin_Q3, time);
+        SET_STATE(SUD, _pin_Q4, time);
+        SET_STATE(SUD, _pin_Q5, time);
+        SET_STATE(SUD, _pin_Q6, time);
+        SET_STATE(SUD, _pin_Q7, time);
         SET_STATE(SUD, _pin_Q8, time);
     }
 }
