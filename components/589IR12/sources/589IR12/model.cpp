@@ -88,7 +88,7 @@ VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
         SET_STATE(SLO, _pin_Q8, time);
         /// При установке системы в исходное состояние инзким уровнем сигнала CLR
         /// триггер запроса прерывания устанавливается в 1
-        SET_STATE(true, _pin_INR, time);
+        SET_STATE(SHI, _pin_INR, time);
         _instance->log("MBR: Reset");
         return;
     }
@@ -97,7 +97,7 @@ VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
 
     /// Триггер запроса прерывания устанавливается в 1 при условии выбора устройства
     if (selected && (_pin_CS1->isnegedge() || _pin_CS2->isposedge())) {
-        SET_STATE(true, _pin_INR, time);
+        SET_STATE(SHI, _pin_INR, time);
     }
 
     /** Режимы работы
@@ -124,7 +124,7 @@ VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
             ///При работе в режиме ввода входной сигнал EW производит запись информации в регистр данных
             /// и установку триггера запроса в 0.
 
-            SET_STATE(false, _pin_INR, time);
+            SET_STATE(SLO, _pin_INR, time);
             _instance->log("MBR: Data read");
         }
         SET_STATE(data[0] ? SHI : SLO, _pin_Q1, time);
