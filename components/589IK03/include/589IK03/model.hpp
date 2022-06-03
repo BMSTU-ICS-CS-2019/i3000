@@ -59,7 +59,7 @@ private:
     static VOID SET_INVERSE_STATE(BOOL condition, IDSIMPIN2* pin, ABSTIME time);
 
 public:
-    static constexpr DWORD MODEL_KEY = 0x00000003;
+    static constexpr DWORD MODEL_KEY = 0x00000056;
 
     INT isdigital(CHAR* pinname) override;
 
