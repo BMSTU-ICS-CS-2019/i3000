@@ -212,6 +212,7 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
                 break;
         }
 
+
         _instance->log("589IK02: ron[0] = %d; ron[1] = %d; ron[2] = %d; ron[3] = %d; ron[4] = %d;", _rons[0], _rons[1],
                        _rons[2], _rons[3], _rons[4]);
         _instance->log("589IK02: ron[5] = %d; ron[6] = %d; ron[7] = %d; ron[8] = %d; ron[9] = %d;", _rons[5], _rons[6],
@@ -219,23 +220,19 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
 
         _instance->log("589IK02: AC: %d, PA: %d, T: %d", _AC, _PA, _T);
 
-        UINT a0 = A & 1U; //TO_INVERSE_UINT(_pin_M0); // 10 a0 = 00  a1 = 01
-        UINT a1 = A >> 1U;//TO_INVERSE_UINT(_pin_M1);
-        UINT b0 = B & 1U; //TO_INVERSE_UINT(_pin_I0) & TO_INVERSE_UINT(_pin_K0);
-        UINT b1 = B >> 1U;//TO_INVERSE_UINT(_pin_I1) & TO_INVERSE_UINT(_pin_K1);
+        UINT a0 = A & 1U;
+        UINT a1 = A >> 1U;
+        UINT b0 = B & 1U;
+        UINT b1 = B >> 1U;
 
         if (F_group < 5) {
             X = a0 & b0 | a1 & b1;
-            Y = a1 & b1 | a0 & b1 | b0 & b1 | a0 & a1;
+            Y = a1 & b1 | a0 & b1 | a1 & b0 | b0 & b1 | a0 & a1;
             C0 = ((~(C1 & Y)) & 3) | (X & Y);
-            // _instance->log("589IK02: A: %d, B: %d, R[0]: %d !!!!!!", A, B, *Rn_AT);
-            if ((A != 0 || B != 0) && (*Rn_AT == 0)) { X = 1U; }
         } else {
             X = 0U;
             Y = 0U;
         }
-
-        //_instance->log("589IK02: X: %d, Y: %d", X, Y);
 
         if (ishigh(_pin_EA->getstate())) {
             A0 = 0U;
@@ -250,8 +247,8 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
             D0 = 0U;
             D1 = 0U;
         } else {
-            D0 = ~_AC & 1U;
-            D1 = ~_AC & 2U;
+            D0 = ~(*Rn_AT) & 1U;
+            D1 = ~(*Rn_AT) & 2U;
         }
         _instance->log("589IK02: D0: %d, D1: %d", D0, D1);
 
