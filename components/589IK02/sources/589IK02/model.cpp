@@ -14,6 +14,23 @@
 
 #include <589IK02/model.hpp>
 
+/*
+ЗАПУСКАЕМ
+░ГУСЯ░▄▀▀▀▄░РАБОТЯГИ░░
+▄███▀░◐░░░▌░░░░░░░
+░░░░▌░░░░░▐░░░░░░░
+░░░░▐░░░░░▐░░░░░░░
+░░░░▌░░░░░▐▄▄░░░░░
+░░░░▌░░░░▄▀▒▒▀▀▀▀▄
+░░░▐░░░░▐▒▒▒▒▒▒▒▒▀▀▄
+░░░▐░░░░▐▄▒▒▒▒▒▒▒▒▒▒▀▄
+░░░░▀▄░░░░▀▄▒▒▒▒▒▒▒▒▒▒▀▄
+░░░░░░▀▄▄▄▄▄█▄▄▄▄▄▄▄▄▄▄▄▀▄
+░░░░░░░░░░░▌▌░▌▌░░░░░
+░░░░░░░░░░░▌▌░▌▌░░░░░
+░░░░░░░░░▄▄▌▌▄▌▌░░░░░
+*/
+
 INT I3000_589IK02_Model::isdigital(CHAR* pinname) {
     return 1;
 }
@@ -87,7 +104,7 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
         _instance->log("589IK02: R_group: %d, F_group: %d", R_group, F_group);
 
         // Choosing Rn_AT or AT.
-        UINT* Rn_AT;
+        UINT* Rn_AT;// =X
         for (UINT i = 0U; i < 10U; ++i) {
             if (i == R_group) { Rn_AT = &_rons[i]; }
         }
@@ -108,13 +125,16 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
             Rn_M_AT = *Rn_AT;
         }
 
+        UINT I = TO_INVERSE_UINT(_pin_I1, _pin_I0);
+        ;
         // Choosing B or AC.
-        UINT B_AC;
+        UINT B_AC;// = Y
         if (R_group < 14U) {
             B_AC = _AC;
         } else {
-            B_AC = TO_INVERSE_UINT(_pin_I1, _pin_I0);
+            B_AC = I;
         }
+
 
         UINT C1 = TO_INVERSE_UINT(_pin_CI);
         UINT R1 = TO_INVERSE_UINT(_pin_RI);
@@ -128,83 +148,94 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
         R0 = 0U;
 
         int case2_result = 0U;
+
+        UINT A = *Rn_AT;
+        UINT B = 0;
         switch (F_group) {
             case 0:
-                _instance->log("589IK02: in case 0");
                 if (R_group < 14U) {
-                    if ((Rn_M_AT + (_AC & K) + C1) > 3U) { C0 = 1U; }
+                    B = _AC & K;
+                    // if ((Rn_M_AT + (_AC & K) + C1) > 3U) { C0 = 1U; }
                     *Rn_AT = (Rn_M_AT + (_AC & K) + C1) % 4;
                     if (R_group != 10U) { _AC = *Rn_AT; }
                 } else {
+                    B = I & K;
                     R0 = 1 & Rn_M_AT & ~(B_AC & K);
                     *Rn_AT = 2U & ((R1 << 1U) | (B_AC & K & Rn_M_AT));
                     *Rn_AT |= 1U & ((Rn_M_AT & B_AC & K) | ((Rn_M_AT & B_AC & K) >> 1U));
                 }
                 break;
             case 1:
-                _instance->log("589IK02: in case 1");
                 if (R_group < 14) {
+                    B = K;
                     _PA = K | Rn_M_AT;
-                    if ((Rn_M_AT + K + C1) > 3U) { C0 = 1U; }
+                    //    if ((Rn_M_AT + K + C1) > 3U) { C0 = 1U; }
                     *Rn_AT = (Rn_M_AT + K + C1) % 4;
                 } else {
-                    *Rn_AT = ((~Rn_M_AT | K) + (Rn_M_AT & K) + C1) % 4;
+                    A = ((~Rn_M_AT) & 3) | K;
+                    B = Rn_M_AT & K;
+                    *Rn_AT = (A + B + C1) % 4;
                 }
                 break;
             case 2:
-                _instance->log("589IK02: in case 2");
+                B = _AC & K;
+                A = 0;
                 case2_result = B_AC - 1U + C1;
                 if (case2_result < 0U) {
-                    C0 = 1U;
+                    //C0 = 1U;
                     case2_result += 4;
                 }
                 *Rn_AT = case2_result;
                 break;
             case 3:
-                _instance->log("589IK02: in case 3");
-
-                if ((Rn_M_AT + B_AC + C1) > 3U) { C0 = 1U; }
+                B = B_AC;
+                //if ((Rn_M_AT + B_AC + C1) > 3U) { C0 = 1U; }
                 *Rn_AT = (Rn_M_AT + B_AC + C1) % 4;
                 break;
             case 4:
-                _instance->log("589IK02: in case 4");
                 C0 = C1 | (Rn_M_AT & B_AC);
                 *Rn_AT = Rn_M_AT & B_AC;
                 break;
             case 5:
-                _instance->log("589IK02: in case 5");
                 C0 = C1 | (Rn_M_AT & K);
                 *Rn_AT = K & Rn_M_AT;
                 break;
             case 6:
-                _instance->log("589IK02: in case 6");
                 C0 = C1 | B_AC;
                 *Rn_AT = Rn_M_AT | B_AC;
                 break;
             case 7:
-                _instance->log("589IK02: in case 7");
                 C0 = C1 | (Rn_M_AT & B_AC);
-                *Rn_AT = ~(Rn_M_AT ^ B_AC);
+                *Rn_AT = (~(Rn_M_AT ^ B_AC)) & 3;
                 break;
             default:
                 break;
         }
 
-        for (UINT i = 0U; i < 10U; ++i) { _instance->log("589IK02: ron[%d] = %d", i, _rons[i]); }
+        _instance->log("589IK02: ron[0] = %d; ron[1] = %d; ron[2] = %d; ron[3] = %d; ron[4] = %d;", _rons[0], _rons[1],
+                       _rons[2], _rons[3], _rons[4]);
+        _instance->log("589IK02: ron[5] = %d; ron[6] = %d; ron[7] = %d; ron[8] = %d; ron[9] = %d;", _rons[5], _rons[6],
+                       _rons[7], _rons[8], _rons[9]);
 
-        _instance->log("589IK02: AC: %d", _AC);
-        _instance->log("589IK02: PA: %d", _PA);
-        _instance->log("589IK02: T: %d", _T);
+        _instance->log("589IK02: AC: %d, PA: %d, T: %d", _AC, _PA, _T);
 
-        UINT a0 = TO_INVERSE_UINT(_pin_M0);
-        UINT a1 = TO_INVERSE_UINT(_pin_M1);
-        UINT b0 = TO_INVERSE_UINT(_pin_I0) & TO_INVERSE_UINT(_pin_K0);
-        UINT b1 = TO_INVERSE_UINT(_pin_I1) & TO_INVERSE_UINT(_pin_K1);
+        UINT a0 = A & 1U; //TO_INVERSE_UINT(_pin_M0); // 10 a0 = 00  a1 = 01
+        UINT a1 = A >> 1U;//TO_INVERSE_UINT(_pin_M1);
+        UINT b0 = B & 1U; //TO_INVERSE_UINT(_pin_I0) & TO_INVERSE_UINT(_pin_K0);
+        UINT b1 = B >> 1U;//TO_INVERSE_UINT(_pin_I1) & TO_INVERSE_UINT(_pin_K1);
 
-        /*UINT*/ X = a0 & b0 | a1 & b1;
-        /*UINT*/ Y = a1 & b1 | a0 & b1 | b0 & b1 | a0 & a1;
+        if (F_group < 5) {
+            X = a0 & b0 | a1 & b1;
+            Y = a1 & b1 | a0 & b1 | b0 & b1 | a0 & a1;
+            C0 = ((~(C1 & Y)) & 3) | (X & Y);
+            // _instance->log("589IK02: A: %d, B: %d, R[0]: %d !!!!!!", A, B, *Rn_AT);
+            if ((A != 0 || B != 0) && (*Rn_AT == 0)) { X = 1U; }
+        } else {
+            X = 0U;
+            Y = 0U;
+        }
 
-        _instance->log("589IK02: X: %d, Y: %d", X, Y);
+        //_instance->log("589IK02: X: %d, Y: %d", X, Y);
 
         if (ishigh(_pin_EA->getstate())) {
             A0 = 0U;
