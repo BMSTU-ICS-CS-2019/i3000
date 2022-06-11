@@ -18,7 +18,7 @@
 
 extern "C" {
     IDSIMMODEL __declspec(dllexport) * createdsimmodel(CHAR* device, ILICENCESERVER* license_server) {
-        return license_server->authorize(I3000_589AP16_Model::MODEL_KEY) ? new I3000_589AP16_Model() : nullptr;
+        return new I3000_589AP16_Model();
     }
 
     VOID __declspec(dllexport) deletedsimmodel(IDSIMMODEL* model) {
