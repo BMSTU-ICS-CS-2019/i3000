@@ -55,6 +55,7 @@ VOID I3000_589IR12_Model::setup(IINSTANCE* instance, IDSIMCKT* dsim) {
     _pin_Q7->setstate(SUD);
     _pin_Q8->setstate(SUD);
 
+
     _instance->log("MBR: Set up");
 }
 
@@ -78,6 +79,7 @@ VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
         data[6] = false;
         data[7] = false;
 
+
         SET_STATE(SLO, _pin_Q1, time);
         SET_STATE(SLO, _pin_Q2, time);
         SET_STATE(SLO, _pin_Q3, time);
@@ -89,6 +91,7 @@ VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
         /// При установке системы в исходное состояние инзким уровнем сигнала CLR
         /// триггер запроса прерывания устанавливается в 1
         SET_STATE(SHI, _pin_INR, time);
+
         _instance->log("MBR: Reset");
         return;
     }
@@ -97,7 +100,9 @@ VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
 
     /// Триггер запроса прерывания устанавливается в 1 при условии выбора устройства
     if (selected && (_pin_CS1->isnegedge() || _pin_CS2->isposedge())) {
+
         SET_STATE(SHI, _pin_INR, time);
+
     }
 
     /** Режимы работы
@@ -146,6 +151,7 @@ VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
         SET_STATE(SUD, _pin_Q6, time);
         SET_STATE(SUD, _pin_Q7, time);
         SET_STATE(SUD, _pin_Q8, time);
+
     }
 
     if (_pin_MD->isactive()) {
@@ -161,6 +167,9 @@ VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
 }
 VOID I3000_589IR12_Model::SET_STATE(STATE state, IDSIMPIN2* pin, ABSTIME time) {
     pin->setstate(time, details::DELAY, state);
+}
+VOID I3000_589IR12_Model::SET_STATE(bool condition, IDSIMPIN2* pin, ABSTIME time) {
+    pin->setstate(time, details::DELAY, condition ? SHI : SLO);
 }
 
 VOID I3000_589IR12_Model::callback(ABSTIME time, EVENTID eventid) {}
