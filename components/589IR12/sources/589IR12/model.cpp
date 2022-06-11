@@ -45,15 +45,15 @@ VOID I3000_589IR12_Model::setup(IINSTANCE* instance, IDSIMCKT* dsim) {
     _pin_Q7= instance->getdsimpin("Q7", true);
     _pin_Q8 = instance->getdsimpin("Q8", true);
 
-    _pin_INR->setstate(SLO);
-    _pin_Q1->setstate(SLO);
-    _pin_Q2->setstate(SLO);
-    _pin_Q3->setstate(SLO);
-    _pin_Q4->setstate(SLO);
-    _pin_Q5->setstate(SLO);
-    _pin_Q6->setstate(SLO);
-    _pin_Q7->setstate(SLO);
-    _pin_Q8->setstate(SLO);
+    _pin_INR->setstate(SUD);
+    _pin_Q1->setstate(SUD);
+    _pin_Q2->setstate(SUD);
+    _pin_Q3->setstate(SUD);
+    _pin_Q4->setstate(SUD);
+    _pin_Q5->setstate(SUD);
+    _pin_Q6->setstate(SUD);
+    _pin_Q7->setstate(SUD);
+    _pin_Q8->setstate(SUD);
 
     _instance->log("MBR: Set up");
 }
@@ -136,6 +136,17 @@ VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
         SET_STATE(data[6] ? SHI : SLO, _pin_Q7, time);
         SET_STATE(data[7] ? SHI : SLO, _pin_Q8, time);
     }
+    // Если не выбрано, на выходе 3-е состояние, независимо от того что хранится
+    if (!selected && _pin_MD->isinactive()) {
+        SET_STATE(SUD, _pin_Q1, time);
+        SET_STATE(SUD, _pin_Q2, time);
+        SET_STATE(SUD, _pin_Q3, time);
+        SET_STATE(SUD, _pin_Q4, time);
+        SET_STATE(SUD, _pin_Q5, time);
+        SET_STATE(SUD, _pin_Q6, time);
+        SET_STATE(SUD, _pin_Q7, time);
+        SET_STATE(SUD, _pin_Q8, time);
+    }
 
     if (_pin_MD->isactive()) {
         SET_STATE(data[0] ? SHI : SLO, _pin_Q1, time);
@@ -146,18 +157,6 @@ VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
         SET_STATE(data[5] ? SHI : SLO, _pin_Q6, time);
         SET_STATE(data[6] ? SHI : SLO, _pin_Q7, time);
         SET_STATE(data[7] ? SHI : SLO, _pin_Q8, time);
-    }
-
-    // Если не выбрано, на выходе нули, независимо от того что хранится
-    if (!selected) {
-        SET_STATE(SUD, _pin_Q1, time);
-        SET_STATE(SUD, _pin_Q2, time);
-        SET_STATE(SUD, _pin_Q3, time);
-        SET_STATE(SUD, _pin_Q4, time);
-        SET_STATE(SUD, _pin_Q5, time);
-        SET_STATE(SUD, _pin_Q6, time);
-        SET_STATE(SUD, _pin_Q7, time);
-        SET_STATE(SUD, _pin_Q8, time);
     }
 }
 VOID I3000_589IR12_Model::SET_STATE(STATE state, IDSIMPIN2* pin, ABSTIME time) {
