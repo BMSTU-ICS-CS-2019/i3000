@@ -56,7 +56,7 @@ BOOL I3000_589AP26_Model::indicate(REALTIME time, ACTIVEDATA* newstate) {
 
 VOID I3000_589AP26_Model::simulate(ABSTIME time, DSIMMODES mode) {
     /// При наличии лог. 1 на входе CS формирователи находятся в выключенном состоянии и выходы имеют высокое сопротивление
-    if (_pin_CS->isactive()) {
+    if (_pin_CS->isactive() || _pin_DCE->isedge()) {
         SET_STATE(SUD, _pin_DB0, time);
         SET_STATE(SUD, _pin_DB1, time);
         SET_STATE(SUD, _pin_DB2, time);
@@ -69,28 +69,28 @@ VOID I3000_589AP26_Model::simulate(ABSTIME time, DSIMMODES mode) {
         SET_STATE(SUD, _pin_DI1, time);
         SET_STATE(SUD, _pin_DI2, time);
         SET_STATE(SUD, _pin_DI3, time);
+        if (_pin_CS->isactive()) return;
+    }
+    /// При наличии на входе DCE лог. 1 происходит передача информации с входов DB на выходы DO
+    if (_pin_DCE->isactive()) {
+        SET_STATE(_pin_DB0->isactive() ? SLO : SHI, _pin_DO0, time);
+        SET_STATE(_pin_DB1->isactive() ? SLO : SHI, _pin_DO1, time);
+        SET_STATE(_pin_DB2->isactive() ? SLO : SHI, _pin_DO2, time);
+        SET_STATE(_pin_DB3->isactive() ? SLO : SHI, _pin_DO3, time);
+        SET_STATE(SUD, _pin_DI0, time);
+        SET_STATE(SUD, _pin_DI1, time);
+        SET_STATE(SUD, _pin_DI2, time);
+        SET_STATE(SUD, _pin_DI3, time);
     } else {
-        /// При наличии на входе DCE лог. 1 происходит передача информации с входов DB на выходы DO
-        if (_pin_DCE->isactive()) {
-            SET_STATE(_pin_DB0->isactive() ? SLO : SHI, _pin_DO0, time);
-            SET_STATE(_pin_DB1->isactive() ? SLO : SHI, _pin_DO1, time);
-            SET_STATE(_pin_DB2->isactive() ? SLO : SHI, _pin_DO2, time);
-            SET_STATE(_pin_DB3->isactive() ? SLO : SHI, _pin_DO3, time);
-            SET_STATE(SUD, _pin_DI0, time);
-            SET_STATE(SUD, _pin_DI1, time);
-            SET_STATE(SUD, _pin_DI2, time);
-            SET_STATE(SUD, _pin_DI3, time);
-        } else {
-            /// Если на входе DCE присутствует напряжение лог. 0, то открыта передача информации с входов DI на выходы DB
-            SET_STATE(_pin_DI0->isactive() ? SLO : SHI, _pin_DB0, time);
-            SET_STATE(_pin_DI1->isactive() ? SLO : SHI, _pin_DB1, time);
-            SET_STATE(_pin_DI2->isactive() ? SLO : SHI, _pin_DB2, time);
-            SET_STATE(_pin_DI3->isactive() ? SLO : SHI, _pin_DB3, time);
-            SET_STATE(SUD, _pin_DO0, time);
-            SET_STATE(SUD, _pin_DO1, time);
-            SET_STATE(SUD, _pin_DO2, time);
-            SET_STATE(SUD, _pin_DO3, time);
-        }
+        /// Если на входе DCE присутствует напряжение лог. 0, то открыта передача информации с входов DI на выходы DB
+        SET_STATE(_pin_DI0->isactive() ? SLO : SHI, _pin_DB0, time);
+        SET_STATE(_pin_DI1->isactive() ? SLO : SHI, _pin_DB1, time);
+        SET_STATE(_pin_DI2->isactive() ? SLO : SHI, _pin_DB2, time);
+        SET_STATE(_pin_DI3->isactive() ? SLO : SHI, _pin_DB3, time);
+        SET_STATE(SUD, _pin_DO0, time);
+        SET_STATE(SUD, _pin_DO1, time);
+        SET_STATE(SUD, _pin_DO2, time);
+        SET_STATE(SUD, _pin_DO3, time);
     }
 }
 
