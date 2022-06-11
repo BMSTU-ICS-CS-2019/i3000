@@ -57,7 +57,7 @@ private:
     VOID SET_STATE(STATE state, IDSIMPIN2* pin, ABSTIME time);
 
 public:
-    static constexpr DWORD MODEL_KEY = 0x00000000;
+    static constexpr DWORD MODEL_KEY = 0x00000010;
 
     INT isdigital(CHAR* pinname) override;
 
