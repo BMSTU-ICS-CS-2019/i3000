@@ -72,20 +72,20 @@ VOID I3000_589AP16_Model::simulate(ABSTIME time, DSIMMODES mode) {
     } else {
         /// При наличии на входе DCE лог. 1 происходит передача информации с входов DB на выходы DO
         if (_pin_DCE->isactive()) {
-            SET_STATE(_pin_DB0->getstate(), _pin_DO0, time);
-            SET_STATE(_pin_DB1->getstate(), _pin_DO1, time);
-            SET_STATE(_pin_DB2->getstate(), _pin_DO2, time);
-            SET_STATE(_pin_DB3->getstate(), _pin_DO3, time);
+            SET_STATE(_pin_DB0->isactive() ? SHI : SLO, _pin_DO0, time);
+            SET_STATE(_pin_DB1->isactive() ? SHI : SLO, _pin_DO1, time);
+            SET_STATE(_pin_DB2->isactive() ? SHI : SLO, _pin_DO2, time);
+            SET_STATE(_pin_DB3->isactive() ? SHI : SLO, _pin_DO3, time);
             SET_STATE(SUD, _pin_DI0, time);
             SET_STATE(SUD, _pin_DI1, time);
             SET_STATE(SUD, _pin_DI2, time);
             SET_STATE(SUD, _pin_DI3, time);
         } else {
             /// Если на входе DCE присутствует напряжение лог. 0, то открыта передача информации с входов DI на выходы DB
-            SET_STATE(_pin_DI0->getstate(), _pin_DB0, time);
-            SET_STATE(_pin_DI1->getstate(), _pin_DB1, time);
-            SET_STATE(_pin_DI2->getstate(), _pin_DB2, time);
-            SET_STATE(_pin_DI3->getstate(), _pin_DB3, time);
+            SET_STATE(_pin_DI0->isactive() ? SHI : SLO, _pin_DB0, time);
+            SET_STATE(_pin_DI1->isactive() ? SHI : SLO, _pin_DB1, time);
+            SET_STATE(_pin_DI2->isactive() ? SHI : SLO, _pin_DB2, time);
+            SET_STATE(_pin_DI3->isactive() ? SHI : SLO, _pin_DB3, time);
             SET_STATE(SUD, _pin_DO0, time);
             SET_STATE(SUD, _pin_DO1, time);
             SET_STATE(SUD, _pin_DO2, time);
