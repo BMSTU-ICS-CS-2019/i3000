@@ -52,7 +52,7 @@ namespace k589 {
 
         // requested interruption
         BYTE _rgr = 0;
-        BOOL _rgr_ANY = false;
+        BOOL _rgr_has_any = false;
 
         // priority
         BYTE _rgs = 0;
