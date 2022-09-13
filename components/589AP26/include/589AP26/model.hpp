@@ -16,6 +16,10 @@
 
 #include <i3000/prelude.hpp>
 
+namespace details{
+    const RELTIME DELAY = 50'000;
+}
+
 class I3000_589AP26_Model : public IDSIMMODEL {
 private:
     // INSTANCE
@@ -40,8 +44,9 @@ private:
     IDSIMPIN* _pin_DCE;
     IDSIMPIN* _pin_CS;
 
+    VOID SET_STATE(STATE state, IDSIMPIN2* pin, ABSTIME time);
 public:
-    static constexpr DWORD MODEL_KEY = 0x00000000;
+    static constexpr DWORD MODEL_KEY = 0x00000012;
 
     INT isdigital(CHAR* pinname) override;
 
