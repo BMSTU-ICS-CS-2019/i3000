@@ -29,7 +29,7 @@ VOID I3000_589IR12_Model::setup(IINSTANCE* instance, IDSIMCKT* dsim) {
     _pin_D6 = instance->getdsimpin("D6", true);
     _pin_D7 = instance->getdsimpin("D7", true);
     _pin_D8 = instance->getdsimpin("D8", true);
-    _pin_CLR= instance->getdsimpin("CLR", true);
+    _pin_CLR = instance->getdsimpin("CLR", true);
     _pin_CS1 = instance->getdsimpin("CS1", true);
     _pin_CS2 = instance->getdsimpin("CS2", true);
     _pin_MD = instance->getdsimpin("MD", true);
@@ -41,8 +41,8 @@ VOID I3000_589IR12_Model::setup(IINSTANCE* instance, IDSIMCKT* dsim) {
     _pin_Q3 = instance->getdsimpin("Q3", true);
     _pin_Q4 = instance->getdsimpin("Q4", true);
     _pin_Q5 = instance->getdsimpin("Q5", true);
-    _pin_Q6= instance->getdsimpin("Q6", true);
-    _pin_Q7= instance->getdsimpin("Q7", true);
+    _pin_Q6 = instance->getdsimpin("Q6", true);
+    _pin_Q7 = instance->getdsimpin("Q7", true);
     _pin_Q8 = instance->getdsimpin("Q8", true);
 
     _pin_INR->setstate(SUD);
@@ -102,7 +102,6 @@ VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
     if (selected && (_pin_CS1->isnegedge() || _pin_CS2->isposedge())) {
 
         SET_STATE(SHI, _pin_INR, time);
-
     }
 
     /** Режимы работы
@@ -151,7 +150,6 @@ VOID I3000_589IR12_Model::simulate(ABSTIME time, DSIMMODES mode) {
         SET_STATE(SUD, _pin_Q6, time);
         SET_STATE(SUD, _pin_Q7, time);
         SET_STATE(SUD, _pin_Q8, time);
-
     }
 
     if (_pin_MD->isactive()) {

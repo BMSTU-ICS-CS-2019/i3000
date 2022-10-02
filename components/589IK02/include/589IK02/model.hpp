@@ -56,10 +56,10 @@ private:
     IDSIMPIN* _pin_D1;
 
     // REGISTERS
-    UINT _rons[10];// R0-R9
-    UINT _T = 0U;  // R10
-    UINT _PA = 0U; // address register
-    UINT _AC = 0U; // battery register
+    UINT _rons[10]; // R0-R9
+    UINT _T = 0U;   // R10
+    UINT _PA = 0U;  // address register
+    UINT _AC = 0U;  // battery register
 
     //OUTPUTS
     UINT R0 = 0U;

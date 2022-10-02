@@ -34,7 +34,7 @@ VOID I3000_589AP16_Model::setup(IINSTANCE* instance, IDSIMCKT* dsim) {
     _pin_DB2 = instance->getdsimpin("DB2", true);
     _pin_DB3 = instance->getdsimpin("DB3", true);
     _pin_DCE = instance->getdsimpin("DCE", true);
-    _pin_CS  = instance->getdsimpin("CS", true);
+    _pin_CS = instance->getdsimpin("CS", true);
 
     _pin_DB0->setstate(SUD);
     _pin_DB1->setstate(SUD);
@@ -91,9 +91,7 @@ VOID I3000_589AP16_Model::simulate(ABSTIME time, DSIMMODES mode) {
         SET_STATE(SUD, _pin_DO1, time);
         SET_STATE(SUD, _pin_DO2, time);
         SET_STATE(SUD, _pin_DO3, time);
-
     }
-
 }
 
 VOID I3000_589AP16_Model::callback(ABSTIME time, EVENTID eventid) {}

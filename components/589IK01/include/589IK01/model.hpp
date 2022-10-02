@@ -16,7 +16,7 @@
 
 #include <i3000/prelude.hpp>
 
-namespace details{
+namespace details {
     const RELTIME DELAY = 100'000;
 }
 
@@ -89,12 +89,7 @@ private:
         STC,
         HCZ,
     };
-    enum FlagOutputMnemonic{
-        FF0,
-        FFC,
-        FFZ,
-        FF1
-    };
+    enum FlagOutputMnemonic { FF0, FFC, FFZ, FF1 };
 
     MicroOperationMnemonic get_micro_operation() const;
 
@@ -121,12 +116,13 @@ private:
     void set_PR_latch();
     void output_logic_A();
     void output_K_A();
-    void save_state(bool condition, IDSIMPIN2 *pin);
+    void save_state(bool condition, IDSIMPIN2* pin);
     FlagInputMnemonic get_flag_input_mnemonic() const;
     FlagOutputMnemonic get_flag_output_mnemonic() const;
-    VOID SET_STATE(bool condition, IDSIMPIN2 *pin, ABSTIME time = details::DELAY);
-    static BOOL IS_HIGH(IDSIMPIN * pin);
-    static BOOL IS_LOW(IDSIMPIN * pin);
+    VOID SET_STATE(bool condition, IDSIMPIN2* pin, ABSTIME time = details::DELAY);
+    static BOOL IS_HIGH(IDSIMPIN* pin);
+    static BOOL IS_LOW(IDSIMPIN* pin);
+
 public:
     static constexpr DWORD MODEL_KEY = 0x00000003;
 
