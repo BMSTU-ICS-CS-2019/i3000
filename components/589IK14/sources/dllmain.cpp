@@ -12,10 +12,21 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-#pragma once
+#include <i3000/prelude.hpp>
 
-#include <sdkddkver.h>
+#include <k589ik14.hpp>
 
-#include <Windows.h>
+extern "C" {
+    IDSIMMODEL __declspec(dllexport) * createdsimmodel(CHAR* device, ILICENCESERVER* license_server) {
+        return license_server->authorize(k589::Ik14Model::MODEL_KEY) ? new k589::Ik14Model() : nullptr;
+    }
 
-#include <vsmsdk/vsm.hpp>
+    VOID __declspec(dllexport) deletedsimmodel(IDSIMMODEL* model) {
+        delete dynamic_cast<k589::Ik14Model*>(model);
+    }
+}
+
+BOOL WINAPI DllMain([[maybe_unused]] HMODULE hmodule, [[maybe_unused]] DWORD call_reason,
+                    [[maybe_unused]] LPVOID _reserved) {
+    return TRUE;
+}
