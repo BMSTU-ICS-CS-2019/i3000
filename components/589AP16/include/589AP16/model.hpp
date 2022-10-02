@@ -16,7 +16,7 @@
 
 #include <i3000/prelude.hpp>
 
-namespace details{
+namespace details {
     const RELTIME DELAY = 50'000;
 }
 

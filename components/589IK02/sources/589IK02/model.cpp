@@ -80,7 +80,7 @@ VOID I3000_589IK02_Model::setup(IINSTANCE* instance, IDSIMCKT* dsimckt) {
     _pin_D0->setstate(SLO);
     _pin_D1->setstate(SLO);
 
-    for (UINT& _ron: _rons) { _ron = 0U; }
+    for (UINT& _ron: _rons) _ron = 0U;
     _T = 0;
     _PA = 0;
     _AC = 0;
@@ -104,9 +104,11 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
         _instance->log("589IK02: R_group: %d, F_group: %d", R_group, F_group);
 
         // Choosing Rn_AT or AT.
-        UINT* Rn_AT;// =X
+        UINT* Rn_AT; // =X
         for (UINT i = 0U; i < 10U; ++i) {
-            if (i == R_group) { Rn_AT = &_rons[i]; }
+            if (i == R_group) {
+                Rn_AT = &_rons[i];
+            }
         }
 
         if (R_group > 9U) {
@@ -128,7 +130,7 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
         UINT I = TO_INVERSE_UINT(_pin_I1, _pin_I0);
         ;
         // Choosing B or AC.
-        UINT B_AC;// = Y
+        UINT B_AC; // = Y
         if (R_group < 14U) {
             B_AC = _AC;
         } else {
@@ -140,7 +142,9 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
         UINT R1 = TO_INVERSE_UINT(_pin_RI);
         UINT K = TO_INVERSE_UINT(_pin_K1, _pin_K0);
 
-        if (F_group > 1U) { B_AC = B_AC & K; }
+        if (F_group > 1U) {
+            B_AC = B_AC & K;
+        }
 
         _instance->log("589IK02: C1: %d, R1: %d, K: %d", C1, R1, K);
 
@@ -157,7 +161,9 @@ VOID I3000_589IK02_Model::simulate(ABSTIME time, DSIMMODES mode) {
                     B = _AC & K;
                     // if ((Rn_M_AT + (_AC & K) + C1) > 3U) { C0 = 1U; }
                     *Rn_AT = (Rn_M_AT + (_AC & K) + C1) % 4;
-                    if (R_group != 10U) { _AC = *Rn_AT; }
+                    if (R_group != 10U) {
+                        _AC = *Rn_AT;
+                    }
                 } else {
                     B = I & K;
                     R0 = 1 & Rn_M_AT & ~(B_AC & K);
@@ -274,25 +280,43 @@ VOID I3000_589IK02_Model::callback(ABSTIME time, EVENTID eventid) {}
 
 UINT I3000_589IK02_Model::TO_UINT(IDSIMPIN* p8, IDSIMPIN* p4, IDSIMPIN* p2, IDSIMPIN* p1) {
     UINT res = 0U;
-    if (ishigh(p8->istate())) { res += 8U; }
-    if (ishigh(p4->istate())) { res += 4U; }
-    if (ishigh(p2->istate())) { res += 2U; }
-    if (ishigh(p1->istate())) { res += 1U; }
+    if (ishigh(p8->istate())) {
+        res += 8U;
+    }
+    if (ishigh(p4->istate())) {
+        res += 4U;
+    }
+    if (ishigh(p2->istate())) {
+        res += 2U;
+    }
+    if (ishigh(p1->istate())) {
+        res += 1U;
+    }
     return res;
 }
 
 UINT I3000_589IK02_Model::TO_UINT(IDSIMPIN* p4, IDSIMPIN* p2, IDSIMPIN* p1) {
     UINT res = 0U;
-    if (ishigh(p4->istate())) { res += 4U; }
-    if (ishigh(p2->istate())) { res += 2U; }
-    if (ishigh(p1->istate())) { res += 1U; }
+    if (ishigh(p4->istate())) {
+        res += 4U;
+    }
+    if (ishigh(p2->istate())) {
+        res += 2U;
+    }
+    if (ishigh(p1->istate())) {
+        res += 1U;
+    }
     return res;
 }
 
 UINT I3000_589IK02_Model::TO_INVERSE_UINT(IDSIMPIN* p2, IDSIMPIN* p1) {
     UINT res = 0U;
-    if (islow(p2->istate())) { res += 2U; }
-    if (islow(p1->istate())) { res += 1U; }
+    if (islow(p2->istate())) {
+        res += 2U;
+    }
+    if (islow(p1->istate())) {
+        res += 1U;
+    }
     return res;
 }
 

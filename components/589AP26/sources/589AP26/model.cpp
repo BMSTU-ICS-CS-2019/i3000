@@ -34,7 +34,7 @@ VOID I3000_589AP26_Model::setup(IINSTANCE* instance, IDSIMCKT* dsim) {
     _pin_DB2 = instance->getdsimpin("DB2", true);
     _pin_DB3 = instance->getdsimpin("DB3", true);
     _pin_DCE = instance->getdsimpin("DCE", true);
-    _pin_CS  = instance->getdsimpin("CS", true);
+    _pin_CS = instance->getdsimpin("CS", true);
 
     _pin_DB0->setstate(SUD);
     _pin_DB1->setstate(SUD);

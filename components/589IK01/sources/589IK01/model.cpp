@@ -149,10 +149,10 @@ void I3000_589IK01_Model::output_flags() {
             SET_STATE(true, _pin_FO);
             break;
         case FFC:
-            SET_STATE(1-_C, _pin_FO);
+            SET_STATE(1 - _C, _pin_FO);
             break;
         case FFZ:
-            SET_STATE( 1-_Z, _pin_FO);
+            SET_STATE(1 - _Z, _pin_FO);
             break;
         case FF1:
             SET_STATE(false, _pin_FO);
@@ -200,8 +200,7 @@ void I3000_589IK01_Model::output_logic_A() {
         && _A_values[4] == FALSE && _A_values[5] == FALSE && _A_values[6] == FALSE && _A_values[7] == FALSE
         && _A_values[8] == FALSE) {
         SET_STATE(true, _pin_INE);
-    }
-    else{
+    } else {
         SET_STATE(false, _pin_INE);
     }
 }
