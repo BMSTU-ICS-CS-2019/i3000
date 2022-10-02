@@ -74,31 +74,28 @@ namespace k589 {
     }
 
     VOID Ik14Model::simulate(ABSTIME time, DSIMMODES mode) {
-        _instance->log("[%s] Simulating...", MODEL_NAME, time);
+        // whether this is unlocked for this tick
+        auto const unlocked = _block_trigger_inverted;
+        _instance->log("[%s] Simulating [unlocked: %d]", MODEL_NAME, time, unlocked);
 
-        // -- Step 0: reset block-trigger if `!IA` --
+        // -- Step 0: reset block-trigger if needed --
         // do block in case of currently being in interruption mode
         auto const ia_inverted = _pin_IA->isinactive();
-        if (ia_inverted) {
+        if (!ia_inverted && _pin_EW->isposedge()) {
+            _instance->log("[%s]   Not in interruption mode thus no lock is needed", MODEL_NAME);
             _block_trigger_inverted = true;
-            _instance->log("[%s]   Unblocked due to -IA signal", MODEL_NAME);
+            _instance->log("[%s]   Unlocked on EW^", MODEL_NAME);
         }
 
         // -- Step 1: update registers on demand --
         // if the conditions are not met the previous values persist in them
-        if (_block_trigger_inverted) {
+        if (unlocked) {
             _update_rgr();
-            _instance->log("[%s]   Updated RGR to %d (has any: %d)", MODEL_NAME, _rgr, _rgr_ANY);
+            _instance->log("[%s]   Updated RGR to %d (has any: %d)", MODEL_NAME, _rgr, _rgr_has_any);
         }
         if (_pin_EW->isinactive()) {
             _update_rgs();
             _instance->log("[%s]   Updated RGS to %d (allow any: %d)", MODEL_NAME, _rgs, _rgs_GS);
-        }
-
-        // don't block any longer on `EW`
-        if (_pin_EW->isposedge()) {
-            _block_trigger_inverted = false;
-            _instance->log("[%s]   Blocked because of EW positive edge", MODEL_NAME);
         }
 
         // -- Step 2: calculate ICx outputs --
@@ -107,7 +104,7 @@ namespace k589 {
         // register stores the interruption unconditionally
         {
             bool ic0, ic1, ic2;
-            if (_pin_ERC->isinactive() && eg && _rgr_ANY) {
+            if (_pin_ERC->isinactive() && eg && _rgr_has_any) {
                 ic0 = (_rgr & 0b001) != 0;
                 ic1 = (_rgr & 0b010) != 0;
                 ic2 = (_rgr & 0b100) != 0;
@@ -126,20 +123,26 @@ namespace k589 {
         auto const comparison = _rgr > _rgs || _rgs_GS;
         // also update GE which does not need any extra inputs
         {
-            auto const ge = eg && !_rgr_ANY && _rgs_GS;
+            auto const ge = eg && !_rgr_has_any && _rgs_GS;
             _set_state(_pin_GE, time, k589::IR_TO_IC_DELAY /* FIXME? */, ge);
             _instance->log("[%s]   Updated GE to %d", MODEL_NAME, ge);
         }
 
         // -- Step 4: update triggers --
-        {
+        if (_pin_CLK->isposedge()) {
+            _instance->log("[%s]     Updating IA flag on CLK", MODEL_NAME);
             auto const ine = _pin_INE->isactive();
-            _instance->log("[%s]   Interruption requirements: CLK^=%d, has_any=%d, EG=%d, CMP=%d, unblocked=%d, ine=%d",
-                           MODEL_NAME, _pin_CLK->isposedge(), _rgr_ANY, eg, comparison, _block_trigger_inverted, ine);
-            if (_pin_CLK->isposedge() && (_rgr_ANY && eg && comparison && _block_trigger_inverted && ine)) {
-                // invert the value (aka click)
-                _set_state(_pin_IA, time, k589::TRIGGER_UPDATE_DELAY, ia_inverted);
-                _instance->log("[%s]   Flipped interruption trigger to %d", MODEL_NAME, ia_inverted);
+            auto const result = _rgr_has_any && eg && comparison && unlocked && ine;
+
+            _instance->log("[%s]     Interruption values: RGR_any=%d & EG=%d & CMP=%d & unlocked=%d & INE=%d = %d",
+                           MODEL_NAME, _rgr_has_any, eg, comparison, unlocked, ine, result);
+            // use inverted result output
+            _set_state(_pin_IA, time, k589::TRIGGER_UPDATE_DELAY, !result);
+            if (result) {
+                _instance->log("[%s]     Started interruption and locked", MODEL_NAME);
+                _block_trigger_inverted = false;
+            } else {
+                _instance->log("[%s]     Completed interruption", MODEL_NAME);
             }
         }
     }
@@ -150,31 +153,31 @@ namespace k589 {
         // note: all inputs are inverted
         if (_pin_IR7->isinactive()) {
             _rgr = 7;
-            _rgr_ANY = true;
+            _rgr_has_any = true;
         } else if (_pin_IR6->isinactive()) {
             _rgr = 6;
-            _rgr_ANY = true;
+            _rgr_has_any = true;
         } else if (_pin_IR5->isinactive()) {
             _rgr = 5;
-            _rgr_ANY = true;
+            _rgr_has_any = true;
         } else if (_pin_IR4->isinactive()) {
             _rgr = 4;
-            _rgr_ANY = true;
+            _rgr_has_any = true;
         } else if (_pin_IR3->isinactive()) {
             _rgr = 3;
-            _rgr_ANY = true;
+            _rgr_has_any = true;
         } else if (_pin_IR2->isinactive()) {
             _rgr = 2;
-            _rgr_ANY = true;
+            _rgr_has_any = true;
         } else if (_pin_IR1->isinactive()) {
             _rgr = 1;
-            _rgr_ANY = true;
+            _rgr_has_any = true;
         } else if (_pin_IR0->isinactive()) {
             _rgr = 0;
-            _rgr_ANY = true;
+            _rgr_has_any = true;
         } else {
             _rgr = 0;
-            _rgr_ANY = false;
+            _rgr_has_any = false;
         }
     }
 
