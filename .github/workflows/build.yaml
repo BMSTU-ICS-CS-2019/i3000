@@ -21,7 +21,7 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/CMakeLists.txt') }}
 
       - name: Install toolchain
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v1.2
         with:
           vs-version: 16
           msbuild-architecture: x86
