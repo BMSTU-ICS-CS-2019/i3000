@@ -33,7 +33,7 @@ jobs:
         run: cmake --build ${{ github.workspace }}/build --config ${{ env.BUILD_TYPE }}
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3.1.1
+        uses: actions/upload-artifact@v3.1.2
         with:
           name: models
           path: ${{ github.workspace}}/build/components/589*/${{ env.BUILD_TYPE }}/i3000-components-589*.dll
